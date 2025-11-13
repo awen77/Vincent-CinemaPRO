@@ -384,72 +384,78 @@ function play() {
     document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
 </script>
-<!-- ✅ 前端选集解析 Demo （腾讯视频示例） -->
+<!-- ✅ 通用选集解析（腾讯/爱奇艺/优酷） -->
 <script>
-/************  1. 简单配置区  ************/
-const sitePatterns={
+/************  1. 站点规则 ************/
+const sites={
   "v.qq.com":{
     name:"腾讯视频",
-    // 播放页正则，捕获剧集ID 与 当前集数
-    urlReg:/\/x\/cover\/(\w+)\/(\d+)\.html/,
-    // 生成第 n 集播放页
-    makeUrl(id,n)=>`https://v.qq.com/x/cover/${id}/${n}.html`,
-    total:30   // 总集数（可动态抓，这里写死演示）
+    rx:/\/x\/cover\/(\w+)\/(\w+)\.html/,
+    build:(pid,eps)=>eps.map((_,i)=>`https://v.qq.com/x/cover/${pid}/${i+1}.html`)
+  },
+  "www.iqiyi.com":{
+    name:"爱奇艺",
+    rx:/\/v_(\w+)\.html/,
+    build:(pid,eps)=>eps.map((_,i)=>`https://www.iqiyi.com/v_${pid}.html?${i+1}`)
+  },
+  "v.youku.com":{
+    name:"优酷",
+    rx:/\/id_(\w+)==\.html/,
+    build:(pid,eps)=>eps.map((_,i)=>`https://v.youku.com/v_show/id_${pid}==.html?ep=${i+1}`)
   }
-  // 以后再补 优酷/爱奇艺/iQiyi/芒果 等
 };
 
-/************  2. 根据当前地址检测站点并生成选集  ************/
-function buildEpisodeList(){
-  const url=document.getElementById('url').value.trim();
+/************  2. 抓集数（简化：直接读页面<a>里纯数字文案） ************/
+async function fetchEps(url){
+  // 用免费CORS代理
+  const proxy="https://api.allorigins.win/raw?url=";
+  const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
+  // 匹配“纯数字”超链（大部分站集数按钮都是<a>1</a><a>2</a>...）
+  const nums=html.match(/<a[^>]*>\s*(\d+)\s*<\/a>/g);
+  if(!nums) return 30;          // 保底30
+  return [...new Set(nums.map(v=>parseInt(v.replace(/\D/g,""))))].sort((a,b)=>a-b).pop();
+}
+
+/************  3. 主函数 ************/
+async function makeEpList(){
+  const urlBox=document.getElementById('url');
+  const url=urlBox.value.trim();
   if(!url) return;
-
   const host=new URL(url).host;
-  const cfg=sitePatterns[host];
-  if(!cfg) return;               // 不支持此站
+  const cfg=sites[host];
+  if(!cfg) return;                       // 不认识此站
+  const m=url.match(cfg.rx);
+  if(!m) return;
 
-  const m=url.match(cfg.urlReg);
-  if(!m) return;                 // 不符合规律
-  const dramaId=m[1], curEp=parseInt(m[2]);
-
-  // 若已存在选集条，先清
-  const oldBar=document.getElementById('episodeBar');
-  if(oldBar) oldBar.remove();
-
+  const dramaId=m[1];
+  const total=await fetchEps(url);       // 动态抓总集数
   const bar=document.createElement('div');
   bar.id='episodeBar';
-  bar.style.margin='10px 0';
-  bar.innerHTML=`
-    <style>
-      #episodeBar{display:flex;flex-wrap:wrap;gap:6px;}
-      #episodeBar button{
-        background:rgba(20,20,20,.7);
-        border:1px solid rgba(229,9,20,.4);
-        color:#e5e5e5;border-radius:15px;padding:4px 10px;font-size:13px;
-        cursor:pointer;transition:all .3s ease;
-      }
-      #episodeBar button:hover{background:var(--netflix-red-dark);color:#fff}
-      #episodeBar button.active{background:var(--netflix-red);border-color:var(--netflix-red);}
-    </style>`;
-  for(let i=1;i<=cfg.total;i++){
+  bar.style.cssText='margin:12px 0;display:flex;flex-wrap:wrap;gap:6px;';
+  bar.innerHTML=`<style>
+    #episodeBar button{background:rgba(20,20,20,.7);border:1px solid rgba(229,9,20,.4);color:#e5e5e5;border-radius:15px;padding:4px 10px;font-size:13px;cursor:pointer;transition:all .3s ease}
+    #episodeBar button:hover{background:#b20710;color:#fff}
+    #episodeBar button.active{background:#e50914;border-color:#e50914}
+  </style>`;
+
+  for(let i=1;i<=total;i++){
     const btn=document.createElement('button');
     btn.textContent=i;
-    if(i===curEp) btn.className='active';
     btn.onclick=()=>{
-      document.getElementById('url').value=cfg.makeUrl(dramaId,i);
-      play();                 // 直接重新解析
+      urlBox.value=cfg.build(dramaId,new Array(total))[i-1]; // 得单集地址
+      play();                       // 立即解析
+      bar.querySelector('.active')?.classList.remove('active');
+      btn.classList.add('active');
     };
     bar.appendChild(btn);
   }
+  // 若已存在先清
+  document.querySelector('#episodeBar')?.remove();
   document.querySelector('.url-box').after(bar);
 }
 
-/************  3. 监听输入框失焦 & 回车  ************/
-document.getElementById('url').addEventListener('change',buildEpisodeList);
-document.getElementById('url').addEventListener('keyup',e=>{
-  if(e.key==='Enter') buildEpisodeList();
-});
+/************  4. 粘贴即触发 ************/
+document.getElementById('url').addEventListener('input',makeEpList);
 </script>
-
 </body>
 </html>
