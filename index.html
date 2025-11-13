@@ -410,78 +410,43 @@ function play() {
   const panel= document.getElementById('rewardPanel');
   btn.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
 </script>
-  <!-- ✅ 左上角迷你统计条 -->
-<div id="miniStats" style="position:fixed;top:60px;left:15px;display:flex;gap:8px;z-index:9999;">
-  <!-- 访问人数 -->
-  <div class="stat-box">
-    <span>👀 访问</span><span id="vCount">0</span>
-  </div>
-  <!-- 在线人数 -->
-  <div class="stat-box">
-    <span>🔥 在线</span><span id="oCount">0</span>
-  </div>
-  <!-- 今日新增 -->
-  <div class="stat-box">
-    <span>📈 新增</span><span id="tCount">0</span>
-  </div>
+<!-- ✅ 极简必涨版（左上角三件套） -->
+<div id="miniStats" style="position:fixed;top:60px;left:15px;display:flex;gap:8px;z-index:9999;font-size:12px;">
+  <div class="stat-box"><span>👀 今日访问</span><span id="vCount">0</span></div>
+  <div class="stat-box"><span>🔥 在线人数</span><span id="oCount">0</span></div>
+  <div class="stat-box"><span>📈 新增</span><span id="tCount">0</span></div>
 </div>
 
 <style>
-.stat-box{
-  background:rgba(0,0,0,.7);
-  color:#e5e5e5;
-  padding:4px 10px;
-  border-radius:12px;
-  font-size:12px;
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
+.stat-box{background:rgba(0,0,0,.7);color:#e5e5e5;padding:4px 10px;border-radius:12px;display:flex;gap:4px;align-items:center;}
 .stat-box span:last-child{color:#e50914;font-weight:700;}
 </style>
 
 <script>
 (() => {
   const key = 'vc_' + location.pathname;
-  const onlineKey = 'online_' + location.pathname;
-  const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0,10);
-
-  /* ---------- 1. 访问人数（同之前） ---------- */
-  let base = parseInt(localStorage.getItem(key) || 0, 10);
-  const today = new Date().toLocaleDateString();
-  if (localStorage.getItem(key + '_date') !== today) {
-    base += 1;
-    localStorage.setItem(key, base);
-    localStorage.setItem(key + '_date', today);
-  }
+  // 1. 直接 +1（不管同一天）
+  let base = parseInt(localStorage.getItem(key) || 1200, 10); // 初始 1200
+  base += 1;
+  localStorage.setItem(key, base);
   document.getElementById('vCount').textContent = base;
 
-  /* ---------- 2. 在线人数（1-30 随机浮动） ---------- */
-  let online = 1 + Math.floor(Math.random() * 30);
+  // 2. 在线 1-30 随机
+  const online = 1 + Math.floor(Math.random() * 30);
   document.getElementById('oCount').textContent = online;
-  // 每 30 秒微动一次
-  setInterval(() => {
-    online = Math.max(1, online + (Math.random() > 0.5 ? 1 : -1));
-    document.getElementById('oCount').textContent = online;
-  }, 30000);
 
-  /* ---------- 3. 今日新增（0 点重置） ---------- */
-  let todayNew = parseInt(localStorage.getItem(todayKey) || 0, 10);
-  todayNew += 1;   // 本次打开算新增
-  localStorage.setItem(todayKey, todayNew);
-  document.getElementById('tCount').textContent = todayNew;
+  // 3. 新增 = 本次
+  document.getElementById('tCount').textContent = 1;
 
-  /* ---------- 4. 后台假涨（每天 200-300） ---------- */
+  // 4. 后台每 4-6 分钟涨 1 人（每天约 300）
   setInterval(() => {
     base += 1;
-    todayNew += 1;
     localStorage.setItem(key, base);
-    localStorage.setItem(todayKey, todayNew);
     document.getElementById('vCount').textContent = base;
-    document.getElementById('tCount').textContent = todayNew;
-  }, (3 + Math.random() * 4) * 60 * 1000); // 3-7 分钟涨 1 次
+    document.getElementById('tCount').textContent = parseInt(document.getElementById('tCount').textContent, 10) + 1;
+  }, (4 + Math.random() * 2) * 60 * 1000);
 })();
-<script>
+</script>
 
 </body>
 </html>
