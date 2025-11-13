@@ -131,6 +131,62 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.12)!important;
 }
 </style>
+<!-- ✅ 端口暗红统一 + 轮播哲学文案 -->
+<style>
+/* --- 1. 端口选择不再黑底 --- */
+#jk{
+  background:#1a1a1a!important;          /* 与背景同色 */
+  color:#e5e5e5!important;
+  border:1px solid rgba(229,9,20,.45)!important;
+  border-radius:20px!important;
+  padding:4px 10px!important;
+}
+
+/* --- 2. 轮播哲学条 --- */
+.philosophy-bar{
+  height:40px;
+  background:rgba(20,20,20,.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:15px;
+  letter-spacing:1px;
+  position:relative;
+  overflow:hidden;
+}
+.philosophy-bar span{
+  position:absolute;
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.philosophy-bar span.active{opacity:1;}
+</style>
+
+<!-- --- 3. 轮播逻辑 --- -->
+<script>
+const lines=[
+  "人生就像电影，镜头一转，结局就变了。",
+  "把自己活成一道光，潇洒地照亮所有黑暗。",
+  "别急，最好的总在不经意间出现。",
+  "愿你走出半生，归来仍有热泪盈眶。"
+];
+let idx=0;
+function toggleLine(){
+  document.querySelectorAll('.philosophy-bar span').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`#line${idx}`).classList.add('active');
+  idx=(idx+1)%lines.length;
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  const bar=document.createElement('div');
+  bar.className='philosophy-bar';
+  bar.innerHTML=lines.map((t,i)=>`<span id="line${i}">${t}</span>`).join('');
+  document.body.insertAdjacentElement('afterbegin',bar);
+  toggleLine();                       // 先亮第一句
+  setInterval(toggleLine,4000);       // 4s 切换
+});
+</script>
+
 <script src="js/bootstrap.min.js"></script> 
 <script src="js/base64.min.js"></script> 
 <script src="js/video.js"></script>
