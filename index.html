@@ -457,5 +457,61 @@ async function makeEpList(){
 /************  4. 粘贴即触发 ************/
 document.getElementById('url').addEventListener('input',makeEpList);
 </script>
+<!-- ✅ 优酷选集补丁（前端纯JS） -->
+<script>
+/************  1. 优酷专用 ************/
+const youku={
+  rx:/\/id_(\w+)==\.html/,               // 提取剧集ID
+  // 生成第n集播放页（优酷规律：ep参数）
+  build:(id,n)=>`https://v.youku.com/v_show/id_${id}==.html?ep=${n}`,
+  // 代理+简易解析总集数（取播放页“共XX集”字样）
+  total:async(url)=>{
+    const proxy="https://api.allorigins.win/raw?url=";
+    const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
+    const m=html.match(/共(\d+)集/);
+    return m?parseInt(m[1]):30;        // 保底30
+  }
+};
+
+/************  2. 主函数 ************/
+async function makeYoukuList(){
+  const urlBox=document.getElementById('url');
+  const url=urlBox.value.trim();
+  if(!url || !url.includes('v.youku.com')) return; // 只认优酷
+
+  const m=url.match(youku.rx);
+  if(!m) return;
+  const dramaId=m[1];
+  const total=await youku.total(url);   // 动态抓总集数
+
+  // 若已存在先清
+  document.querySelector('#episodeBar')?.remove();
+  const bar=document.createElement('div');
+  bar.id='episodeBar';
+  bar.style.cssText='margin:12px 0;display:flex;flex-wrap:wrap;gap:6px;';
+  bar.innerHTML=`<style>
+    #episodeBar button{background:rgba(20,20,20,.7);border:1px solid rgba(229,9,20,.4);color:#e5e5e5;border-radius:15px;padding:4px 10px;font-size:13px;cursor:pointer;transition:all .3s ease}
+    #episodeBar button:hover{background:#b20710;color:#fff}
+    #episodeBar button.active{background:#e50914;border-color:#e50914}
+  </style>`;
+
+  for(let i=1;i<=total;i++){
+    const btn=document.createElement('button');
+    btn.textContent=i;
+    btn.onclick=()=>{
+      urlBox.value=youku.build(dramaId,i);
+      play();                       // 立即解析
+      bar.querySelector('.active')?.classList.remove('active');
+      btn.classList.add('active');
+    };
+    bar.appendChild(btn);
+  }
+  document.querySelector('.url-box').after(bar);
+}
+
+/************  3. 粘贴即触发 ************/
+document.getElementById('url').addEventListener('input',makeYoukuList);
+</script>
+
 </body>
 </html>
