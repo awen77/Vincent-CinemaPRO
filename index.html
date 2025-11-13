@@ -384,21 +384,24 @@ function play() {
     document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
 </script>
-<!-- ✅ 优酷选集-真地址版 + 失败自动换线 -->
+<!-- ✅ 优酷净化地址 + 选集 -->
 <script>
-/************  1. 优酷真实规律 ************/
+/************  1. 净化函数 ************/
+function cleanYoukuUrl(raw){
+  // 1. 去掉所有参数  2. 确保以 .html 结尾
+  const u=new URL(raw);
+  return `https://v.youku.com/v_show/${u.pathname.split('/').pop().split('?')[0]}`;
+}
+
+/************  2. 优酷真实规律 ************/
 const youku={
-  // 从任意一集提取 dramaId 与 当前集数索引
-  rx:/\/id_(\w+)==\.html(?:\?.*&?ep=(\d+))?/,
-  // 真正播放页：把整段 id 换掉即可
-  build:(baseId,idx)=>{
-    // baseId 示例：XNTExNjQ2MzY0  把最后两位 64→01/02/03...
-    const head=baseId.slice(0,-2);      // 前面不变
+  rx:/\/id_(\w+)==\.html/,
+  build:(pureId,idx)=>{
+    const head=pureId.slice(0,-2);
     const tail=String(idx).padStart(2,'0');
     return `https://v.youku.com/v_show/id_${head}${tail}==.html`;
   },
-  // 简易抓总集数（“共XX集”）
-  total:async(url)=>{
+  total:async url=>{
     const proxy="https://api.allorigins.win/raw?url=";
     const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
     const m=html.match(/共(\d+)集/);
@@ -406,15 +409,17 @@ const youku={
   }
 };
 
-/************  2. 主函数 ************/
+/************  3. 主函数 ************/
 async function makeYoukuList(){
   const urlBox=document.getElementById('url');
-  const url=urlBox.value.trim();
-  if(!url || !url.includes('v.youku.com')) return;
+  const dirty=urlBox.value.trim();
+  if(!dirty.includes('v.youku.com')) return;
+  const url=cleanYoukuUrl(dirty);   // 先净化
+  urlBox.value=url;                 // 回写干净地址
 
   const m=url.match(youku.rx);
   if(!m) return;
-  const baseId=m[1];                 // 不含集数的基 ID
+  const pureId=m[1];
   const total=await youku.total(url);
 
   document.querySelector('#episodeBar')?.remove();
@@ -431,7 +436,7 @@ async function makeYoukuList(){
     const btn=document.createElement('button');
     btn.textContent=i;
     btn.onclick=()=>{
-      urlBox.value=youku.build(baseId,i);
+      urlBox.value=youku.build(pureId,i);
       play();                               // 立即解析
       bar.querySelector('.active')?.classList.remove('active');
       btn.classList.add('active');
@@ -441,7 +446,7 @@ async function makeYoukuList(){
   document.querySelector('.url-box').after(bar);
 }
 
-/************  3. 粘贴即触发 ************/
+/************  4. 粘贴即触发 ************/
 document.getElementById('url').addEventListener('input',makeYoukuList);
 </script>
 
