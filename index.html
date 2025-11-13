@@ -410,41 +410,52 @@ function play() {
   const panel= document.getElementById('rewardPanel');
   btn.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
 </script>
-<!-- ✅ 极简必涨版（左上角三件套） -->
-<div id="miniStats" style="position:fixed;top:60px;left:15px;display:flex;gap:8px;z-index:9999;font-size:12px;">
-  <div class="stat-box"><span>👀 今日访问</span><span id="vCount">0</span></div>
-  <div class="stat-box"><span>🔥 在线人数</span><span id="oCount">0</span></div>
-  <div class="stat-box"><span>📈 新增</span><span id="tCount">0</span></div>
+<!-- ✅ 今日访问 -->
+<div id="todayBox" style="position:fixed;top:60px;left:15px;background:rgba(0,0,0,.7);color:#e5e5e5;padding:6px 12px;border-radius:15px;font-size:13px;z-index:9999;">
+  <span>📅 今日访问人数：</span><span id="todayCount">0</span>
 </div>
-
-<style>
-.stat-box{background:rgba(0,0,0,.7);color:#e5e5e5;padding:4px 10px;border-radius:12px;display:flex;gap:4px;align-items:center;}
-.stat-box span:last-child{color:#e50914;font-weight:700;}
-</style>
 
 <script>
 (() => {
-  const key = 'vc_' + location.pathname;
-  // 1. 直接 +1（不管同一天）
-  let base = parseInt(localStorage.getItem(key) || 1200, 10); // 初始 1200
-  base += 1;
-  localStorage.setItem(key, base);
-  document.getElementById('vCount').textContent = base;
+  const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
+  const baseKey = todayKey + '_base'; // 今天已造假数
 
-  // 2. 在线 1-30 随机
-  const online = 1 + Math.floor(Math.random() * 30);
-  document.getElementById('oCount').textContent = online;
+  // 1. 真人打开：必 +1
+  let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
+  real += 1;
+  localStorage.setItem(todayKey, real);
 
-  // 3. 新增 = 本次
-  document.getElementById('tCount').textContent = 1;
+  // 2. 每天 500-1000 随机总量
+  let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
+  if (base === 0) { // 第一次进今天
+    base = 500 + Math.floor(Math.random() * 501); // 500-1000
+    localStorage.setItem(baseKey, base);
+  }
 
-  // 4. 后台每 4-6 分钟涨 1 人（每天约 300）
-  setInterval(() => {
-    base += 1;
-    localStorage.setItem(key, base);
-    document.getElementById('vCount').textContent = base;
-    document.getElementById('tCount').textContent = parseInt(document.getElementById('tCount').textContent, 10) + 1;
-  }, (4 + Math.random() * 2) * 60 * 1000);
+  // 3. 后台均匀涨：8 小时内涨完（每 30-60 秒涨 1 次）
+  const need = base - real;
+  if (need > 0) {
+    const gap = (8 * 3600 * 1000) / need; // 每次间隔
+    const jitter = gap * 0.5; // 随机抖动
+    setInterval(() => {
+      real += 1;
+      localStorage.setItem(todayKey, real);
+      animateNumber(document.getElementById('todayCount'), real - 1, real, 400);
+    }, gap + Math.random() * jitter);
+  }
+
+  // 4. 初始显示
+  animateNumber(document.getElementById('todayCount'), 0, real, 600);
+
+  function animateNumber(el, start, end, duration) {
+    const range = end - start, stepTime = 16, steps = Math.ceil(duration / stepTime);
+    let now = 0;
+    const timer = setInterval(() => {
+      now++;
+      el.textContent = Math.floor(start + range * now / steps);
+      if (now === steps) clearInterval(timer);
+    }, stepTime);
+  }
 })();
 </script>
 
