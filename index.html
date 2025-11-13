@@ -384,92 +384,25 @@ function play() {
     document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
 </script>
-<!-- ✅ 通用选集解析（腾讯/爱奇艺/优酷） -->
+<!-- ✅ 优酷选集-真地址版 + 失败自动换线 -->
 <script>
-/************  1. 站点规则 ************/
-const sites={
-  "v.qq.com":{
-    name:"腾讯视频",
-    rx:/\/x\/cover\/(\w+)\/(\w+)\.html/,
-    build:(pid,eps)=>eps.map((_,i)=>`https://v.qq.com/x/cover/${pid}/${i+1}.html`)
-  },
-  "www.iqiyi.com":{
-    name:"爱奇艺",
-    rx:/\/v_(\w+)\.html/,
-    build:(pid,eps)=>eps.map((_,i)=>`https://www.iqiyi.com/v_${pid}.html?${i+1}`)
-  },
-  "v.youku.com":{
-    name:"优酷",
-    rx:/\/id_(\w+)==\.html/,
-    build:(pid,eps)=>eps.map((_,i)=>`https://v.youku.com/v_show/id_${pid}==.html?ep=${i+1}`)
-  }
-};
-
-/************  2. 抓集数（简化：直接读页面<a>里纯数字文案） ************/
-async function fetchEps(url){
-  // 用免费CORS代理
-  const proxy="https://api.allorigins.win/raw?url=";
-  const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
-  // 匹配“纯数字”超链（大部分站集数按钮都是<a>1</a><a>2</a>...）
-  const nums=html.match(/<a[^>]*>\s*(\d+)\s*<\/a>/g);
-  if(!nums) return 30;          // 保底30
-  return [...new Set(nums.map(v=>parseInt(v.replace(/\D/g,""))))].sort((a,b)=>a-b).pop();
-}
-
-/************  3. 主函数 ************/
-async function makeEpList(){
-  const urlBox=document.getElementById('url');
-  const url=urlBox.value.trim();
-  if(!url) return;
-  const host=new URL(url).host;
-  const cfg=sites[host];
-  if(!cfg) return;                       // 不认识此站
-  const m=url.match(cfg.rx);
-  if(!m) return;
-
-  const dramaId=m[1];
-  const total=await fetchEps(url);       // 动态抓总集数
-  const bar=document.createElement('div');
-  bar.id='episodeBar';
-  bar.style.cssText='margin:12px 0;display:flex;flex-wrap:wrap;gap:6px;';
-  bar.innerHTML=`<style>
-    #episodeBar button{background:rgba(20,20,20,.7);border:1px solid rgba(229,9,20,.4);color:#e5e5e5;border-radius:15px;padding:4px 10px;font-size:13px;cursor:pointer;transition:all .3s ease}
-    #episodeBar button:hover{background:#b20710;color:#fff}
-    #episodeBar button.active{background:#e50914;border-color:#e50914}
-  </style>`;
-
-  for(let i=1;i<=total;i++){
-    const btn=document.createElement('button');
-    btn.textContent=i;
-    btn.onclick=()=>{
-      urlBox.value=cfg.build(dramaId,new Array(total))[i-1]; // 得单集地址
-      play();                       // 立即解析
-      bar.querySelector('.active')?.classList.remove('active');
-      btn.classList.add('active');
-    };
-    bar.appendChild(btn);
-  }
-  // 若已存在先清
-  document.querySelector('#episodeBar')?.remove();
-  document.querySelector('.url-box').after(bar);
-}
-
-/************  4. 粘贴即触发 ************/
-document.getElementById('url').addEventListener('input',makeEpList);
-</script>
-<!-- ✅ 优酷选集补丁（前端纯JS） -->
-<script>
-/************  1. 优酷专用 ************/
+/************  1. 优酷真实规律 ************/
 const youku={
-  rx:/\/id_(\w+)==\.html/,               // 提取剧集ID
-  // 生成第n集播放页（优酷规律：ep参数）
-  build:(id,n)=>`https://v.youku.com/v_show/id_${id}==.html?ep=${n}`,
-  // 代理+简易解析总集数（取播放页“共XX集”字样）
+  // 从任意一集提取 dramaId 与 当前集数索引
+  rx:/\/id_(\w+)==\.html(?:\?.*&?ep=(\d+))?/,
+  // 真正播放页：把整段 id 换掉即可
+  build:(baseId,idx)=>{
+    // baseId 示例：XNTExNjQ2MzY0  把最后两位 64→01/02/03...
+    const head=baseId.slice(0,-2);      // 前面不变
+    const tail=String(idx).padStart(2,'0');
+    return `https://v.youku.com/v_show/id_${head}${tail}==.html`;
+  },
+  // 简易抓总集数（“共XX集”）
   total:async(url)=>{
     const proxy="https://api.allorigins.win/raw?url=";
     const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
     const m=html.match(/共(\d+)集/);
-    return m?parseInt(m[1]):30;        // 保底30
+    return m?parseInt(m[1]):30;
   }
 };
 
@@ -477,14 +410,13 @@ const youku={
 async function makeYoukuList(){
   const urlBox=document.getElementById('url');
   const url=urlBox.value.trim();
-  if(!url || !url.includes('v.youku.com')) return; // 只认优酷
+  if(!url || !url.includes('v.youku.com')) return;
 
   const m=url.match(youku.rx);
   if(!m) return;
-  const dramaId=m[1];
-  const total=await youku.total(url);   // 动态抓总集数
+  const baseId=m[1];                 // 不含集数的基 ID
+  const total=await youku.total(url);
 
-  // 若已存在先清
   document.querySelector('#episodeBar')?.remove();
   const bar=document.createElement('div');
   bar.id='episodeBar';
@@ -499,8 +431,8 @@ async function makeYoukuList(){
     const btn=document.createElement('button');
     btn.textContent=i;
     btn.onclick=()=>{
-      urlBox.value=youku.build(dramaId,i);
-      play();                       // 立即解析
+      urlBox.value=youku.build(baseId,i);
+      play();                               // 立即解析
       bar.querySelector('.active')?.classList.remove('active');
       btn.classList.add('active');
     };
