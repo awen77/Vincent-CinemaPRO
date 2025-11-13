@@ -16,36 +16,130 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <script src="js/jquery.min.js"></script> 
-  <!-- ✅ 移动端美颜（放最后，覆盖前面） -->
+  <<!-- ✅ Netflix 全局强制视觉（只调色，不改布局） -->
 <style>
-/* ✅ 移动端奈飞视觉（只调色，不改布局） */
-@media (max-width: 767px) {
-    /* 1. 输入栏：玻璃→深黑玻璃，边框暗红 */
-    .url-box {
-        background: rgba(10, 10, 10, .75);   /* Netflix 深黑 */
-        border: 1px solid rgba(229, 9, 20, .35); /* Netflix 暗红 */
-        box-shadow: 0 10px 30px rgba(229, 9, 20, .25);
-    }
-    .form-control.url-text,
-    #url {
-        color: #e5e5e5;                     /* 浅灰文字 */
-    }
-    ::placeholder { color: #b3b3b3; }
-
-    /* 2. 按钮：Netflix 暗红渐变 */
-    .btn-play,
-    .play-btn {
-        background: linear-gradient(45deg, #e50914, #b20710);
-        box-shadow: 0 5px 20px rgba(229, 9, 20, .55);
-    }
-    .btn-play:active,
-    .play-btn:active { transform: scale(0.95); }
-
-    /* 3. 播放器卡片：深黑阴影 */
-    .player-card {
-        box-shadow: 0 15px 40px rgba(0, 0, 0, .75);
-    }
+/* ---------- 1. 通用变量 ---------- */
+:root{
+  --netflix-bg:#141414;
+  --netflix-bg-light:#181818;
+  --netflix-red:#e50914;
+  --netflix-red-dark:#b20710;
+  --netflix-text:#e5e5e5;
+  --netflix-text-dark:#b3b3b3;
 }
+
+/* ---------- 2. 背景与导航栏 ---------- */
+body{
+  background:var(--netflix-bg)!important;
+}
+header.navbar-fixed-top,
+.header,
+.navbar-default{
+  background: rgba(20,20,20,.95)!important;
+  border-bottom:1px solid var(--netflix-red-dark)!important;
+}
+.navbar-brand,
+.navbar-nav>li>a{
+  color:var(--netflix-text)!important;
+  font-weight:700!important;
+}
+.navbar-nav>li>a:hover{
+  color:var(--netflix-red)!important;
+}
+
+/* ---------- 3. 播放器区域 ---------- */
+.video-box{
+  background:var(--netflix-bg-light)!important;
+}
+#palybox{
+  background:#000!important;
+  border:1px solid var(--netflix-red-dark)!important;
+  box-shadow:0 0 20px rgba(229,9,20,.35)!important;
+}
+
+/* ---------- 4. 输入框 ---------- */
+.url-box{
+  background:rgba(24,24,24,.75)!important;
+  border:1px solid var(--netflix-red-dark)!important;
+  box-shadow:0 8px 25px rgba(0,0,0,.6)!important;
+}
+#url{
+  background:transparent!important;
+  color:var(--netflix-text)!important;
+  border:none!important;
+}
+::placeholder{color:var(--netflix-text-dark)!important;}
+
+/* ---------- 5. 下拉选线路 ---------- */
+#jk{
+  background:#000!important;
+  color:var(--netflix-text)!important;
+  border:1px solid var(--netflix-red-dark)!important;
+}
+
+/* ---------- 6. 按钮 ---------- */
+.btn-play,
+.play-btn{
+  background:linear-gradient(45deg,var(--netflix-red),var(--netflix-red-dark))!important;
+  border:none!important;
+  color:#fff!important;
+  font-weight:700!important;
+  box-shadow:0 5px 20px rgba(229,9,20,.55)!important;
+  transition:all .3s ease;
+}
+.btn-play:hover,
+.play-btn:hover{
+  filter:brightness(1.15)!important;
+}
+.btn-play:active,
+.play-btn:active{transform:scale(.96)!important;}
+
+/* ---------- 7. 提示文字 ---------- */
+.tit-gg a{
+  color:var(--netflix-text-dark)!important;
+}
+.tit-gg a:hover{
+  color:var(--netflix-red)!important;
+}
+
+/* ---------- 8. 内容卡片 ---------- */
+.logo-box,
+.container-fluid.logo-box{
+  background:var(--netflix-bg)!important;
+}
+.title-tit h4{
+  color:var(--netflix-text)!important;
+  border-left:4px solid var(--netflix-red)!important;
+  padding-left:8px!important;
+}
+.title-tit ul li{
+  color:var(--netflix-text-dark)!important;
+}
+
+/* ---------- 9. 支持网站 logo 背景 ---------- */
+.logo-lie{
+  background:#000!important;
+  border-radius:4px!important;
+  padding:6px!important;
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.logo-lie:hover{
+  transform:scale(1.05)!important;
+  box-shadow:0 0 15px rgba(229,9,20,.5)!important;
+}
+
+/* ---------- 10. 评论区 ---------- */
+.cy-box{
+  background:var(--netflix-bg-light)!important;
+  padding:15px 0!important;
+}
+
+/* ---------- 11. 滚动条美化（Chrome） ---------- */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:var(--netflix-red);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--netflix-red-dark)}
+</style>
 
 </style>
 <script src="js/bootstrap.min.js"></script> 
