@@ -384,44 +384,34 @@ function play() {
     document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
 </script>
-<!-- ✅ 优酷净化地址 + 选集 -->
+<!-- ✅ 优酷真实选集（官方接口版） -->
 <script>
-/************  1. 净化函数 ************/
-function cleanYoukuUrl(raw){
-  // 1. 去掉所有参数  2. 确保以 .html 结尾
-  const u=new URL(raw);
-  return `https://v.youku.com/v_show/${u.pathname.split('/').pop().split('?')[0]}`;
+/************  1. 拿官方剧集列表 ************/
+async function getYoukuEpisodes(rawUrl){
+  // 1. 先洗出视频ID
+  const vid=new URL(rawUrl).pathname.match(/id_(\w+)/)[1];
+  // 2. 官方接口（带免费CORS代理）
+  const api=`https://api.allorigins.win/raw?url=`+
+            encodeURIComponent(`https://ups.youku.com/ups/get.json?vid=${vid}&cc=01010101`);
+  const json=await fetch(api).then(r=>r.json());
+  // 3. 提取剧集列表（官方字段）
+  if(!json.data || !json.data.segs) return [];
+  return json.data.segs.map(s=>({
+    title: s.title||`第${s.order}集`,
+    url: `https://v.youku.com/v_show/id_${s.vid}.html`
+  }));
 }
 
-/************  2. 优酷真实规律 ************/
-const youku={
-  rx:/\/id_(\w+)==\.html/,
-  build:(pureId,idx)=>{
-    const head=pureId.slice(0,-2);
-    const tail=String(idx).padStart(2,'0');
-    return `https://v.youku.com/v_show/id_${head}${tail}==.html`;
-  },
-  total:async url=>{
-    const proxy="https://api.allorigins.win/raw?url=";
-    const html=await fetch(proxy+encodeURIComponent(url)).then(r=>r.text());
-    const m=html.match(/共(\d+)集/);
-    return m?parseInt(m[1]):30;
-  }
-};
-
-/************  3. 主函数 ************/
+/************  2. 主函数 ************/
 async function makeYoukuList(){
   const urlBox=document.getElementById('url');
-  const dirty=urlBox.value.trim();
-  if(!dirty.includes('v.youku.com')) return;
-  const url=cleanYoukuUrl(dirty);   // 先净化
-  urlBox.value=url;                 // 回写干净地址
+  const raw=urlBox.value.trim();
+  if(!raw.includes('v.youku.com')) return;
 
-  const m=url.match(youku.rx);
-  if(!m) return;
-  const pureId=m[1];
-  const total=await youku.total(url);
+  const list=await getYoukuEpisodes(raw);
+  if(list.length===0) return;        // 非剧集 or 接口失效
 
+  // 清旧条
   document.querySelector('#episodeBar')?.remove();
   const bar=document.createElement('div');
   bar.id='episodeBar';
@@ -432,23 +422,22 @@ async function makeYoukuList(){
     #episodeBar button.active{background:#e50914;border-color:#e50914}
   </style>`;
 
-  for(let i=1;i<=total;i++){
+  list.forEach((ep,idx)=>{
     const btn=document.createElement('button');
-    btn.textContent=i;
+    btn.textContent=ep.title;
     btn.onclick=()=>{
-      urlBox.value=youku.build(pureId,i);
-      play();                               // 立即解析
+      urlBox.value=ep.url;   // 官方真实地址
+      play();                // 立即解析
       bar.querySelector('.active')?.classList.remove('active');
       btn.classList.add('active');
     };
     bar.appendChild(btn);
-  }
+  });
   document.querySelector('.url-box').after(bar);
 }
 
-/************  4. 粘贴即触发 ************/
+/************  3. 粘贴即触发 ************/
 document.getElementById('url').addEventListener('input',makeYoukuList);
 </script>
-
 </body>
 </html>
