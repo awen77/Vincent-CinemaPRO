@@ -131,18 +131,30 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.12)!important;
 }
 </style>
-<!-- ✅ 端口暗红统一 + 轮播哲学文案 -->
+<!-- ✅ 端口分割 & 10s 渐变轮播 -->
 <style>
-/* --- 1. 端口选择不再黑底 --- */
+/* ===== 端口与输入框统一外观 ===== */
+.url-box .input-group-addon{
+  background:transparent!important;
+  border:none!important;
+  padding:0 6px!important;
+}
 #jk{
-  background:#1a1a1a!important;          /* 与背景同色 */
+  height:38px!important;               /* 与输入框同高 */
+  background:rgba(20,20,20,.6)!important;
+  backdrop-filter:blur(10px)!important;
   color:#e5e5e5!important;
-  border:1px solid rgba(229,9,20,.45)!important;
-  border-radius:20px!important;
-  padding:4px 10px!important;
+  border:1px solid rgba(229,9,20,.4)!important;
+  border-radius:0 25px 25px 0!important; /* 圆角衔接 */
+  padding:0 10px!important;
+}
+/* 竖线分割 */
+.url-box .form-control.url-text{
+  border-right:1px solid rgba(229,9,20,.4)!important;
+  border-radius:25px 0 0 25px!important;
 }
 
-/* --- 2. 轮播哲学条 --- */
+/* ===== 轮播条放缓 ===== */
 .philosophy-bar{
   height:40px;
   background:rgba(20,20,20,.85);
@@ -158,18 +170,34 @@ body{
 .philosophy-bar span{
   position:absolute;
   opacity:0;
-  transition:opacity .6s ease;
+  transition:opacity 1.2s ease-in-out;   /* 渐变时长 */
 }
 .philosophy-bar span.active{opacity:1;}
 </style>
 
-<!-- --- 3. 轮播逻辑 --- -->
 <script>
+/* ===== 20 句文案 ===== */
 const lines=[
   "人生就像电影，镜头一转，结局就变了。",
   "把自己活成一道光，潇洒地照亮所有黑暗。",
   "别急，最好的总在不经意间出现。",
-  "愿你走出半生，归来仍有热泪盈眶。"
+  "愿你走出半生，归来仍有热泪盈眶。",
+  "故事很长，你别失望。",
+  "风月都好看，人间也浪漫。",
+  "黑夜无论怎样悠长，白昼总会到来。",
+  "山川异域，风月同天。",
+  "宇宙从不失约任何秘密悸动。",
+  "追风赶月莫停留，平芜尽处是春山。",
+  "与其感慨路难行，不如马上出发。",
+  "心有猛虎，细嗅蔷薇。",
+  "凡心所向，素履以往。",
+  "生如逆旅，一苇以航。",
+  "玻璃晴朗，橘子辉煌。",
+  "花开如火，也如寂寞。",
+  "万里星光，一如既往。",
+  "星海横流，岁月成碑。",
+  "时光知味，岁月沉香。",
+  "凛冬散尽，星河长明。"
 ];
 let idx=0;
 function toggleLine(){
@@ -182,8 +210,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   bar.className='philosophy-bar';
   bar.innerHTML=lines.map((t,i)=>`<span id="line${i}">${t}</span>`).join('');
   document.body.insertAdjacentElement('afterbegin',bar);
-  toggleLine();                       // 先亮第一句
-  setInterval(toggleLine,4000);       // 4s 切换
+  toggleLine();
+  setInterval(toggleLine,10000);      // 10 秒渐变
 });
 </script>
 
