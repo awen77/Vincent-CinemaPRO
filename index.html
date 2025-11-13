@@ -384,5 +384,72 @@ function play() {
     document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
 </script>
+<!-- ✅ 前端选集解析 Demo （腾讯视频示例） -->
+<script>
+/************  1. 简单配置区  ************/
+const sitePatterns={
+  "v.qq.com":{
+    name:"腾讯视频",
+    // 播放页正则，捕获剧集ID 与 当前集数
+    urlReg:/\/x\/cover\/(\w+)\/(\d+)\.html/,
+    // 生成第 n 集播放页
+    makeUrl(id,n)=>`https://v.qq.com/x/cover/${id}/${n}.html`,
+    total:30   // 总集数（可动态抓，这里写死演示）
+  }
+  // 以后再补 优酷/爱奇艺/iQiyi/芒果 等
+};
+
+/************  2. 根据当前地址检测站点并生成选集  ************/
+function buildEpisodeList(){
+  const url=document.getElementById('url').value.trim();
+  if(!url) return;
+
+  const host=new URL(url).host;
+  const cfg=sitePatterns[host];
+  if(!cfg) return;               // 不支持此站
+
+  const m=url.match(cfg.urlReg);
+  if(!m) return;                 // 不符合规律
+  const dramaId=m[1], curEp=parseInt(m[2]);
+
+  // 若已存在选集条，先清
+  const oldBar=document.getElementById('episodeBar');
+  if(oldBar) oldBar.remove();
+
+  const bar=document.createElement('div');
+  bar.id='episodeBar';
+  bar.style.margin='10px 0';
+  bar.innerHTML=`
+    <style>
+      #episodeBar{display:flex;flex-wrap:wrap;gap:6px;}
+      #episodeBar button{
+        background:rgba(20,20,20,.7);
+        border:1px solid rgba(229,9,20,.4);
+        color:#e5e5e5;border-radius:15px;padding:4px 10px;font-size:13px;
+        cursor:pointer;transition:all .3s ease;
+      }
+      #episodeBar button:hover{background:var(--netflix-red-dark);color:#fff}
+      #episodeBar button.active{background:var(--netflix-red);border-color:var(--netflix-red);}
+    </style>`;
+  for(let i=1;i<=cfg.total;i++){
+    const btn=document.createElement('button');
+    btn.textContent=i;
+    if(i===curEp) btn.className='active';
+    btn.onclick=()=>{
+      document.getElementById('url').value=cfg.makeUrl(dramaId,i);
+      play();                 // 直接重新解析
+    };
+    bar.appendChild(btn);
+  }
+  document.querySelector('.url-box').after(bar);
+}
+
+/************  3. 监听输入框失焦 & 回车  ************/
+document.getElementById('url').addEventListener('change',buildEpisodeList);
+document.getElementById('url').addEventListener('keyup',e=>{
+  if(e.key==='Enter') buildEpisodeList();
+});
+</script>
+
 </body>
 </html>
