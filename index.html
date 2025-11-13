@@ -140,6 +140,25 @@ header.navbar-fixed-top,
 ::-webkit-scrollbar-thumb{background:var(--netflix-red);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--netflix-red-dark)}
 </style>
+<!-- ✅ 强制“现已支持网站”白色背景 -->
+<style>
+/* 只动颜色，不动布局 */
+.container-fluid.logo-box{
+  background:#fff!important;          /* 整栏纯白 */
+  color:#222!important;               /* 全局深灰字 */
+}
+.logo-box .title-tit h4{
+  color:#222!important;               /* 标题黑色 */
+  border-left-color:#e50914!important;/* 保留奈飞红点缀 */
+}
+.logo-lie{
+  background:#fff!important;          /* Logo 卡片纯白 */
+  box-shadow:0 2px 8px rgba(0,0,0,.08)!important;/* 轻阴影 */
+}
+.logo-lie:hover{
+  box-shadow:0 4px 16px rgba(0,0,0,.12)!important;
+}
+</style>
 
 </style>
 <script src="js/bootstrap.min.js"></script> 
