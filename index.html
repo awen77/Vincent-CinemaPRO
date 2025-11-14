@@ -412,43 +412,5 @@ function play() {
     btn.onclick = () => panel.style.display =
       panel.style.display === 'block' ? 'none' : 'block';
   </script>
-
-  <script>
-  <!-- ✅ 今日访问（300-500 人，5-10 秒可见涨） -->
-<div id="todayBox" style="position:fixed;top:60px;left:15px;background:rgba(0,0,0,.7);color:#e5e5e5;padding:6px 12px;border-radius:15px;font-size:13px;z-index:9999;">
-  <span>📅 今日访问：</span><span id="todayCount">0</span>
-</div>
-
-<script>
-(function () {
-  const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
-  const baseKey  = todayKey + '_base';
-
-  let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
-  real += 1;
-  localStorage.setItem(todayKey, real);
-
-  let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
-  if (base === 0) {
-    base = 300 + Math.floor(Math.random() * 201); // 300-500
-    localStorage.setItem(baseKey, base);
-  }
-
-  document.getElementById('todayCount').textContent = real;
-
-  // 链式涨：每 5-10 秒涨 1 次，涨完为止
-  let left = base - real;
-  if (left > 0) {
-    function tick() {
-      left--;
-      real++;
-      localStorage.setItem(todayKey, real);
-      document.getElementById('todayCount').textContent = real;
-      if (left > 0) setTimeout(tick, 5000 + Math.random() * 5000);
-    }
-    setTimeout(tick, 1000);
-  }
-})();
-</script>
 </body>
 </html>
