@@ -418,43 +418,31 @@ function play() {
 <script>
 (() => {
   const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
-  const baseKey = todayKey + '_base'; // 今天已造假数
+  const baseKey = todayKey + '_base';
 
-  // 1. 真人打开：必 +1
   let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
   real += 1;
   localStorage.setItem(todayKey, real);
 
-  // 2. 每天 500-1000 随机总量
   let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
-  if (base === 0) { // 第一次进今天
-    base = 500 + Math.floor(Math.random() * 501); // 500-1000
+  if (base === 0) {
+    base = 500 + Math.floor(Math.random() * 501);
     localStorage.setItem(baseKey, base);
   }
 
-  // 3. 后台均匀涨：8 小时内涨完（每 30-60 秒涨 1 次）
+  // 直接显示当前值
+  document.getElementById('todayCount').textContent = real;
+
+  // 后台均匀涨：每 30-60 秒涨 1 次，8 小时内涨完
   const need = base - real;
   if (need > 0) {
-    const gap = (8 * 3600 * 1000) / need; // 每次间隔
-    const jitter = gap * 0.5; // 随机抖动
+    const gap = (8 * 3600 * 1000) / need;
+    const jitter = gap * 0.5;
     setInterval(() => {
       real += 1;
       localStorage.setItem(todayKey, real);
-      animateNumber(document.getElementById('todayCount'), real - 1, real, 400);
+      document.getElementById('todayCount').textContent = real;
     }, gap + Math.random() * jitter);
-  }
-
-  // 4. 初始显示
-  animateNumber(document.getElementById('todayCount'), 0, real, 600);
-
-  function animateNumber(el, start, end, duration) {
-    const range = end - start, stepTime = 16, steps = Math.ceil(duration / stepTime);
-    let now = 0;
-    const timer = setInterval(() => {
-      now++;
-      el.textContent = Math.floor(start + range * now / steps);
-      if (now === steps) clearInterval(timer);
-    }, stepTime);
   }
 })();
 </script>
