@@ -13,404 +13,176 @@
 <title>Vincent Cinema Pro - 全能IMAX</title>
 <meta name="keywords" content="解析,vip解析,全民解析,视频解析,在线解析,vip视频解析,vip在线解析,vip会员视频解析,视频解析网站,会员视频解析,m3u8视频解析">
 <meta name="description" content="Vincent Cinema Pro - 全能IMAX，一个长久稳定免费的VIP视频解析接口，支持全网VIP会员视频免费解析，优酷、爱奇艺、腾讯视频、哔哩哔哩、芒果TV、搜狐视频等VIP会员电影电视剧视频免费解析在线观看，支持MP4、M3U8、HLS、FLV视频解析播放，滑屏快进，双击全屏，视频旋转，倍速播放设置！">
-<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/bootstrap.min.css">
-<script src="js/jquery.min.js"></script> 
-  <!-- ✅ 奈飞·极致酷炫（强制覆盖版） -->
+<script src="js/jquery.min.js"></script>
 <style>
-/* ---------- 0. 导航隐形 ---------- */
-header.navbar-fixed-top,
-.navbar-default,
-.navbar-header,
-.navbar-brand,
-.navbar-nav,
-.navbar-toggle{
-  background:0 0!important;
-  border:none!important;
-  box-shadow:none!important;
-  height:0!important;
-  margin:0!important;
-  padding:0!important;
-  overflow:hidden!important;
-}
-
-/* ---------- 1. 播放器四周深黑渐变背景 ---------- */
-body{
-  background:#0e0e0e!important;
-  background:linear-gradient(135deg,#0e0e0e 40%,#1a1a1a 100%)!important;
-}
-.video-box{
-  background:transparent!important;
-  padding-top:20px!important;
-}
-
-/* ---------- 2. 播放器本身：带红色霓虹 ---------- */
-#palybox{
-  background:#000!important;
-  border:1px solid var(--netflix-red-dark)!important;
-  border-radius:8px!important;
-  box-shadow:
-    0 0 20px rgba(229,9,20,.45),
-    0 0 40px rgba(229,9,20,.25)!important;
-  transition:box-shadow .4s ease;
-}
-#palybox:hover{
-  box-shadow:
-    0 0 30px rgba(229,9,20,.65),
-    0 0 60px rgba(229,9,20,.35)!important;
-}
-
-/* ---------- 3. 输入区毛玻璃 + 霓虹边 ---------- */
-.url-box{
-  background:rgba(20,20,20,.6)!important;
-  backdrop-filter:blur(10px)!important;
-  border:1px solid rgba(229,9,20,.4)!important;
-  border-radius:50px!important;
-  box-shadow:
-    0 8px 32px rgba(0,0,0,.6),
-    inset 0 0 12px rgba(229,9,20,.15)!important;
-}
-#url{
-  color:#fff!important;
-  font-size:16px!important;
-}
-::placeholder{color:#aaa!important;}
-
-/* ---------- 4. 下拉线路 ---------- */
-#jk{
-  background:#000!important;
-  color:#fff!important;
-  border:1px solid var(--netflix-red-dark)!important;
-  border-radius:20px!important;
-}
-
-/* ---------- 5. 解析按钮：悬浮亮红 ---------- */
-.btn-play,
-.play-btn{
-  background:linear-gradient(45deg,#e50914,#b20710)!important;
-  border:none!important;
-  border-radius:25px!important;
-  font-weight:700!important;
-  letter-spacing:1px!important;
-  box-shadow:0 5px 20px rgba(229,9,20,.55)!important;
-  transition:all .3s ease;
-}
-.btn-play:hover,
-.play-btn:hover{
-  filter:brightness(1.2)!important;
-  box-shadow:0 8px 30px rgba(229,9,20,.75)!important;
-}
-.btn-play:active{transform:scale(.96)!important;}
-
-/* ---------- 6. 提示文字 ---------- */
-.tit-gg a{color:#aaa!important;font-size:13px!important;}
-.tit-gg a:hover{color:#e50914!important;}
-
-/* ---------- 7. 滚动条 ---------- */
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-track{background:#000}
-::-webkit-scrollbar-thumb{background:#e50914;border-radius:4px}
+/* -------- 奈飞视觉 -------- */
+body{background:#0e0e0e!important;background:linear-gradient(135deg,#0e0e0e 40%,#1a1a1a 100%)!important;color:#e5e5e5}
+header{height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+#palybox{background:#000;border:1px solid #e50914;border-radius:8px;box-shadow:0 0 20px rgba(229,9,20,.45);width:100%;height:500px}
+.url-box{background:rgba(20,20,20,.6);backdrop-filter:blur(10px);border:1px solid rgba(229,9,20,.4);border-radius:50px;padding:8px;margin:15px 0}
+#url{background:transparent;border:none;color:#fff;font-size:16px;width:100%;padding-left:15px}
+#jk{background:#000;color:#fff;border:1px solid #e50914;border-radius:20px;padding:4px 10px}
+.btn-play{background:linear-gradient(45deg,#e50914,#b20710);border:none;border-radius:25px;color:#fff;font-weight:700;padding:8px 20px;box-shadow:0 5px 20px rgba(229,9,20,.55);cursor:pointer}
+.btn-play:hover{filter:brightness(1.2);box-shadow:0 8px 30px rgba(229,9,20,.75)}
+.logo-box{background:#fff!important;padding:20px 0}
+.logo-lie{background:#fff;border-radius:4px;padding:6px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:#e50914;border-radius:4px}
+/* 左上角访问人数 */#todayBox{position:fixed;top:60px;left:15px;background:rgba(0,0,0,.7);color:#e5e5e5;padding:6px 12px;border-radius:15px;font-size:13px;z-index:9999}
+/* 右上角打赏 */#reward{position:fixed;top:60px;right:15px;z-index:9999;text-align:center}#rewardBtn{background:linear-gradient(45deg,#e50914,#b20710);color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}#rewardPanel{display:none;margin-top:8px;background:rgba(0,0,0,.85);border-radius:8px;padding:10px}#rewardPanel img{width:90px;height:90px}
 </style>
-
-<!-- ✅ 强制“现已支持网站”白色背景 -->
-<style>
-/* 只动颜色，不动布局 */
-.container-fluid.logo-box{
-  background:#fff!important;          /* 整栏纯白 */
-  color:#222!important;               /* 全局深灰字 */
-}
-.logo-box .title-tit h4{
-  color:#222!important;               /* 标题黑色 */
-  border-left-color:#e50914!important;/* 保留奈飞红点缀 */
-}
-.logo-lie{
-  background:#fff!important;          /* Logo 卡片纯白 */
-  box-shadow:0 2px 8px rgba(0,0,0,.08)!important;/* 轻阴影 */
-}
-.logo-lie:hover{
-  box-shadow:0 4px 16px rgba(0,0,0,.12)!important;
-}
-</style>
-<!-- ✅ 端口分割 & 10s 渐变轮播 -->
-<style>
-/* ===== 端口与输入框统一外观 ===== */
-.url-box .input-group-addon{
-  background:transparent!important;
-  border:none!important;
-  padding:0 6px!important;
-}
-#jk{
-  height:38px!important;               /* 与输入框同高 */
-  background:rgba(20,20,20,.6)!important;
-  backdrop-filter:blur(10px)!important;
-  color:#e5e5e5!important;
-  border:1px solid rgba(229,9,20,.4)!important;
-  border-radius:0 25px 25px 0!important; /* 圆角衔接 */
-  padding:0 10px!important;
-}
-/* 竖线分割 */
-.url-box .form-control.url-text{
-  border-right:1px solid rgba(229,9,20,.4)!important;
-  border-radius:25px 0 0 25px!important;
-}
-
-/* ===== 轮播条放缓 ===== */
-.philosophy-bar{
-  height:40px;
-  background:rgba(20,20,20,.85);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:15px;
-  letter-spacing:1px;
-  position:relative;
-  overflow:hidden;
-}
-.philosophy-bar span{
-  position:absolute;
-  opacity:0;
-  transition:opacity 1.2s ease-in-out;   /* 渐变时长 */
-}
-.philosophy-bar span.active{opacity:1;}
-</style>
-
-<script>
-/* ===== 20 句文案 ===== */
-const lines=[
-  "人生就像电影，镜头一转，结局就变了。",
-  "把自己活成一道光，潇洒地照亮所有黑暗。",
-  "别急，最好的总在不经意间出现。",
-  "愿你走出半生，归来仍有热泪盈眶。",
-  "故事很长，你别失望。",
-  "风月都好看，人间也浪漫。",
-  "黑夜无论怎样悠长，白昼总会到来。",
-  "山川异域，风月同天。",
-  "宇宙从不失约任何秘密悸动。",
-  "追风赶月莫停留，平芜尽处是春山。",
-  "与其感慨路难行，不如马上出发。",
-  "心有猛虎，细嗅蔷薇。",
-  "凡心所向，素履以往。",
-  "生如逆旅，一苇以航。",
-  "玻璃晴朗，橘子辉煌。",
-  "花开如火，也如寂寞。",
-  "万里星光，一如既往。",
-  "星海横流，岁月成碑。",
-  "时光知味，岁月沉香。",
-  "凛冬散尽，星河长明。"
-];
-let idx=0;
-function toggleLine(){
-  document.querySelectorAll('.philosophy-bar span').forEach(s=>s.classList.remove('active'));
-  document.querySelector(`#line${idx}`).classList.add('active');
-  idx=(idx+1)%lines.length;
-}
-window.addEventListener('DOMContentLoaded',()=>{
-  const bar=document.createElement('div');
-  bar.className='philosophy-bar';
-  bar.innerHTML=lines.map((t,i)=>`<span id="line${i}">${t}</span>`).join('');
-  document.body.insertAdjacentElement('afterbegin',bar);
-  toggleLine();
-  setInterval(toggleLine,10000);      // 10 秒渐变
-});
-</script>
-
-<script src="js/bootstrap.min.js"></script> 
-<script src="js/base64.min.js"></script> 
-<script src="js/video.js"></script>
-<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 </head>
 <body>
-<!--header-->
-<header class="navbar-fixed-top">
-  <div class="container">
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">导航切换</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-          <a class="navbar-brand logo" href="index.html#"></a> </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li> <a href="index.html" target="_blank" title="Vincent Cinema Pro - 全能IMAX" style="color: red !important; font-weight: bold;">Vincent Cinema Pro - 全能IMAX</a> </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </div>
-</header>
-<!--main-->
-<div class="container-fluid video-box">
-  <div class="container ">
-        <div class="tit-name"> <span>正在播放:</span>
-      <h1 id="tittext"> </h1>
+
+<!-- 轮播文案 -->
+<div class="philosophy-bar" id="philosophyBar"></div>
+
+<!-- 今日访问 -->
+<div id="todayBox">📅 今日访问：<span id="todayCount">0</span></div>
+
+<!-- 打赏 -->
+<div id="reward">
+  <div id="rewardBtn">打赏作者</div>
+  <div id="rewardPanel">
+    <div>扫码支持</div>
+    <div style="display:flex;gap:10px">
+      <div><img src="img/wx-qrcode.png" alt="微信"><div>加微信</div></div>
+      <div><img src="img/pay-qrcode.png" alt="收款"><div>收款码</div></div>
     </div>
- <iframe id="palybox" src="about:blank" style="background:#000;" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
+  </div>
+</div>
+
+<!-- 播放器 -->
+<div class="container-fluid video-box">
+  <div class="container">
+    <div class="tit-name"><span>正在播放:</span><h1 id="tittext"></h1></div>
+    <iframe id="palybox" src="about:blank" style="background:#000;" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
     <div class="url-box">
       <div class="input-group">
-        <input type="text" id="url" class="form-control url-text" aria-label="Text input with segmented button dropdown" placeholder="请粘贴视频网址>ㅂ<ﾉ ☆" title="请复制你想要看的视频网址，粘贴到此处点击播放即可！">
+        <input type="text" id="url" class="form-control url-text" placeholder="请粘贴视频网址>ㅂ<ﾉ ☆" title="请复制你想要看的视频网址，粘贴到此处点击播放即可！">
         <div class="input-group-addon">
-          <select class="url-c url-text" title="如发现视频无法正常播放请尝试更换视频线路！" id="jk">
-          <option value="https://jx.2s0.cn/player/?url=">默认解析端口①</option>
-          <option value="https://jx.xmflv.cc/?url=">VIP视频解析②</option>
-          <option value="https://jx.77flv.cc/?url=">VIP视频解析③</option>
-          <option value="https://jx.xymp4.cc/?url=">VIP视频解析④</option>
-          <option value="https://api.quanminjiexi.com/index.php?url=">VIP视频解析⑤</option>
-          <option value="http://v9j.net/?url=">VIP视频解析⑥</option>
+          <select class="url-c url-text" id="jk" title="如发现视频无法正常播放请尝试更换视频线路！">
+            <option value="https://jx.2s0.cn/player/?url=">默认解析端口①</option>
+            <option value="https://jx.xmflv.cc/?url=">VIP视频解析②</option>
+            <option value="https://jx.77flv.cc/?url=">VIP视频解析③</option>
+            <option value="https://jx.xymp4.cc/?url=">VIP视频解析④</option>
+            <option value="https://api.quanminjiexi.com/index.php?url=">VIP视频解析⑤</option>
+            <option value="http://v9j.net/?url=">VIP视频解析⑥</option>
           </select>
         </div>
         <div class="input-group-btn">
-          <button type="button" class="btn btn-default btn-play" title="点击开始解析并开始播放" onclick="play()">解析播放</button>
+          <button type="button" class="btn btn-default btn-play" onclick="play()">解析播放</button>
         </div>
       </div>
     </div>
-    <div class="tit-gg"> <a href="index.html#" target="_blank" >温馨提示：若视频播放异常，尝试更换解析端口即可解决！</a> </div>
+    <div class="tit-gg"><a href="#">温馨提示：若视频播放异常，尝试更换解析端口即可解决！</a></div>
   </div>
 </div>
+
 <div class="container-fluid logo-box">
   <div class="container">
     <div class="row">
-      <div class="col-lg-12">
-        <div class="title-tit">
-          <h4>视频解析操作指南</h4>
-          <ul style="padding:0 15px;font-size:14px;">
-            <li>第&nbsp;一&nbsp;步：进入各大视频网站，找到想要观看的VIP视频（例如：腾讯、爱奇艺、优酷、乐视、芒果、搜狐等），然后复制完整的视频链接。</li>
-            <li>第&nbsp;二&nbsp;步：将复制的视频链接粘贴到播放地址栏，并点击“解析播放”。</li>
-            <li>第&nbsp;三&nbsp;步：等待解析完成，即可免费观看VIP视频。</li>
-            <li>第&nbsp;四&nbsp;步：注意事项：全网VIP电影免费看，若遇到不能播放，确保视频地址无误后，请更换“播放线路”再次点击“解析播放”即可。</li>
-          </ul>
-        </div>
-      </div>
+      <div class="col-lg-12"><div class="title-tit"><h4>视频解析操作指南</h4></div></div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.iqiyi.com/" target="_blank" title="爱奇艺视频"><img class="img-responsive" src="img/logo/iqiyilogo.png" alt="爱奇艺视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://v.qq.com/" target="_blank" title="腾讯视频"><img class="img-responsive" src="img/logo/qqlogo.png" alt="腾讯视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.youku.com/" target="_blank" title="优酷视频"><img class="img-responsive" src="img/logo/youkulogo.png" alt="优酷视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.mgtv.com/" target="_blank" title="芒果视频"><img class="img-responsive" src="img/logo/hunantvlogo.png" alt="芒果视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.le.com/" target="_blank" title="乐视视频"><img class="img-responsive" src="img/logo/letvlogo.png" alt="乐视视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.tudou.com" target="_blank" title="土豆视频"><img class="img-responsive" src="img/logo/tudoulogo.png" alt="土豆视频"></a></div></div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.baofeng.com/" target="_blank" title="暴风视频"><img class="img-responsive" src="img/logo/baofeng.png" alt="暴风视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://vip.1905.com/" target="_blank" title="1905电影网"><img class="img-responsive" src="img/logo/1905logo.png" alt="1905电影网"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.kankan.com/" target="_blank" title="看看视频"><img class="img-responsive" src="img/logo/kankan.png" alt="看看视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.pptv.com/" target="_blank" title="PPTV聚力"><img class="img-responsive" src="img/logo/pptv.png" alt="PPTV聚力"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.yinyuetai.com/" target="_blank" title="音悦台MV"><img class="img-responsive" src="img/logo/yinyuetailogo.png" alt="音悦台MV"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.fun.tv/" target="_blank" title="风行视频"><img class="img-responsive" src="img/logo/fengxing.png" alt="风行视频"></a></div></div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.wasu.cn/" target="_blank" title="华数视频"><img class="img-responsive" src="img/logo/wasulogo.png" alt="华数视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://video.sina.com.cn/" target="_blank" title="新浪视频"><img class="img-responsive" src="img/logo/sinalogo.png" alt="新浪视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://film.sohu.com/" target="_blank" title="搜狐视频"><img class="img-responsive" src="img/logo/sohulogo.png" alt="搜狐视频"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://tv.cctv.com/" target="_blank" title="央视网"><img class="img-responsive" src="img/logo/cntvlogo.png" alt="央视网"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.acfun.cn/" target="_blank" title="Ac弹幕网"><img class="img-responsive" src="img/logo/acfun.png" alt="Ac弹幕网"></a></div></div>
+      <div class="col-xs-4 col-sm-2"><div class="logo-lie"><a rel="nofollow" href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩"><img class="img-responsive" src="img/logo/bilibili.png" alt="哔哩哔哩"></a></div></div>
     </div>
   </div>
 </div>
-<div class="cy-box">
-  <div class="container">
-    <div id="SOHUCS" ></div>
-    <script type="text/javascript"> 
-(function(){ 
-var width = window.innerWidth || document.documentElement.clientWidth; 
-if (width < 1000) {
-var head = document.getElementsByTagName("head")[0]||document.head||document.documentElement;
-var script = document.createElement("script");
-script.type = "text/javascript";
-script.charset = "utf-8";
-head.appendChild(script);
-} else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://cy-cdn.kuaizhan.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script> </div>
-</div>
-<div class="container-fluid logo-box">
-  <div class="container ">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="title-tit">
-          <h4>现已支持网站</h4>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.iqiyi.com/" target="_blank" title="爱奇艺视频"> <img class="img-responsive" src="img/logo/iqiyilogo.png" alt="爱奇艺视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://v.qq.com/" target="_blank" title="腾讯视频"> <img class="img-responsive" src="img/logo/qqlogo.png" alt="腾讯视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.youku.com/" target="_blank" title="优酷视频"> <img class="img-responsive" src="img/logo/youkulogo.png" alt="优酷视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.mgtv.com/" target="_blank" title="芒果视频"> <img class="img-responsive" src="img/logo/hunantvlogo.png"  alt="芒果视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.le.com/" target="_blank" title="乐视视频"> <img class="img-responsive" src="img/logo/letvlogo.png" alt="乐视视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.tudou.com" target="_blank" title="土豆视频"> <img class="img-responsive" src="img/logo/tudoulogo.png" alt="土豆视频"> </a> </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.baofeng.com/" target="_blank" title="暴风视频"> <img class="img-responsive" src="img/logo/baofeng.png" alt="暴风视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://vip.1905.com/" target="_blank" title="1905电影网"> <img class="img-responsive" src="img/logo/1905logo.png" alt="1905电影网"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.kankan.com/" target="_blank" title="看看视频"> <img class="img-responsive" src="img/logo/kankan.png" alt="看看视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.pptv.com/" target="_blank" title="PPTV聚力"> <img class="img-responsive" src="img/logo/pptv.png" alt="PPTV聚力"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.yinyuetai.com/" target="_blank" title="音悦台MV"> <img class="img-responsive" src="img/logo/yinyuetailogo.png" alt="音悦台MV"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.fun.tv/" target="_blank" title="风行视频"> <img class="img-responsive" src="img/logo/fengxing.png" alt="风行视频"> </a> </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.wasu.cn/" target="_blank" title="华数视频"> <img class="img-responsive" src="img/logo/wasulogo.png" alt="华数视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://video.sina.com.cn/" target="_blank" title="新浪视频"> <img class="img-responsive" src="img/logo/sinalogo.png" alt="新浪视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://film.sohu.com/" target="_blank" title="搜狐视频"> <img class="img-responsive" src="img/logo/sohulogo.png" alt="搜狐视频"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://tv.cctv.com/" target="_blank" title="央视网"> <img class="img-responsive" src="img/logo/cntvlogo.png" alt="央视网"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2 ">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.acfun.cn/" target="_blank" title="Ac弹幕网"> <img class="img-responsive" src="img/logo/acfun.png" alt="Ac弹幕网"> </a> </div>
-      </div>
-      <div class="col-xs-4 col-sm-2">
-        <div class="logo-lie"> <a rel="nofollow" href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩"> <img class="img-responsive" src="img/logo/bilibili.png" alt="哔哩哔哩"> </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
-</footer>
-<script>function backTop(){jQuery('html,body').stop(false,true).animate({scrollTop:0},600)}</script> 
-<script>jQuery(function(){jQuery("#wysj-switch").on('click',function(event){if(jQuery(this).hasClass('wysj-icon-open')){jQuery(this).removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open wysj-hidden')}else{jQuery("#wysj-pop").show();jQuery(this).addClass('wysj-icon-open');jQuery("#wysj-normal").addClass('wysj-box-open').removeClass('wysj-hidden')}});jQuery("#wysj-pop").on('click touchstart touchmove',function(event){jQuery("#wysj-switch").removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open').addClass('wysj-hidden');jQuery("#wysj-talk-box").removeClass('wysj-hidden');jQuery(this).hide()});jQuery(".wysj-talk").on('click',function(event){event.preventDefault();jQuery("#wysj-talk-box").addClass('wysj-hidden');jQuery("#wysj-normal").removeClass('wysj-hidden');jQuery("#wysj-pop").show()})});</script> 
-<script>function fuckyou(){window.close();window.location="about:blank"}function ck(){console.profile();console.profileEnd();if(console.clear){console.clear()};if(typeof console.profiles=="object"){return console.profiles.length>0}}function hehe(){if((window.console&&(console.firebug||console.table&&/firebug/i.test(console.table())))||(typeof opera=='object'&&typeof opera.postError=='function'&&console.profile.length>0)){fuckyou()}if(typeof console.profiles=="object"&&console.profiles.length>0){fuckyou()}}hehe();window.onresize=function(){if((window.outerHeight-window.innerHeight)>200)fuckyou()}</script>
+
+<script src="js/bootstrap.min.js"></script>
+<script src="js/base64.min.js"></script>
+<script src="js/video.js"></script>
 <script>
+/* ----------- 解析 ----------- */
 function play() {
-    var url = document.getElementById('url').value;
-    if (!url) {
-        alert('请输入视频地址！');
-        return;
-    }
-    var jk = document.getElementById('jk').value;
-    document.getElementById('tittext').innerHTML = url;
-    document.getElementById('palybox').src = jk + encodeURIComponent(url);
+  const url = document.getElementById('url').value.trim();
+  if (!url) { alert('请输入视频地址！'); return; }
+  const jk = document.getElementById('jk').value;
+  document.getElementById('tittext').innerHTML = url;
+  document.getElementById('palybox').src = jk + encodeURIComponent(url);
 }
+
+/* ----------- 轮播文案（不堆积） ----------- */
+if (!window.barCreated) {
+  window.barCreated = true;
+  const lines = [
+    "人生就像电影，镜头一转，结局就变了。",
+    "把自己活成一道光，潇洒地照亮所有黑暗。",
+    "别急，最好的总在不经意间出现。",
+    "愿你走出半生，归来仍有热泪盈眶。",
+    "故事很长，你别失望。"
+  ];
+  let idx = 0;
+  const bar = document.createElement('div');
+  bar.className = 'philosophy-bar';
+  bar.innerHTML = lines.map((t, i) => `<span id="line${i}">${t}</span>`).join('');
+  document.body.insertAdjacentElement('afterbegin', bar);
+  function toggleLine() {
+    bar.querySelectorAll('span').forEach(s => s.classList.remove('active'));
+    bar.querySelector(`#line${idx}`).classList.add('active');
+    idx = (idx + 1) % lines.length;
+  }
+  toggleLine();
+  setInterval(toggleLine, 10000);
+}
+
+/* ----------- 今日访问（300-500 人，5-10 秒可见涨） ----------- */
+(function () {
+  const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
+  const baseKey  = todayKey + '_base';
+
+  let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
+  real += 1;
+  localStorage.setItem(todayKey, real);
+
+  let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
+  if (base === 0) {
+    base = 300 + Math.floor(Math.random() * 201); // 300-500
+    localStorage.setItem(baseKey, base);
+  }
+  document.getElementById('todayCount').textContent = real;
+
+  let left = base - real;
+  if (left > 0) {
+    function tick() {
+      left--;
+      real++;
+      localStorage.setItem(todayKey, real);
+      document.getElementById('todayCount').textContent = real;
+      if (left > 0) setTimeout(tick, 5000 + Math.random() * 5000);
+    }
+    setTimeout(tick, 1000);
+  }
+
+  /* ----------- 打赏交互 ----------- */
+  const btn   = document.getElementById('rewardBtn');
+  const panel = document.getElementById('rewardPanel');
+  btn.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+})();
 </script>
-<!-- ✅ 打赏作者 - 右上角悬浮 -->
-<div id="reward" style="position:fixed;top:60px;right:15px;z-index:9999;text-align:center;">
 
-  <!-- 文字按钮 -->
-  <div id="rewardBtn" style="background:linear-gradient(45deg,#e50914,#b20710);color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4);">打赏作者</div>
-  <!-- 二维码面板（默认隐藏） -->
-  <div id="rewardPanel" style="display:none;margin-top:8px;background:rgba(0,0,0,.85);border-radius:8px;padding:10px;">
-    <div style="color:#fff;font-size:12px;margin-bottom:8px;">扫码支持</div>
-    <div style="display:flex;gap:10px;">
-      <div>
-        <img src="img/wx-qrcode.png" width="90" height="90" alt="加微信">
-        <div style="color:#fff;font-size:11px;margin-top:4px;">加微信</div>
-      </div>
-      <div>
-        <img src="img/pay-qrcode.png" width="90" height="90" alt="收款码">
-        <div style="color:#fff;font-size:11px;margin-top:4px;">收款码</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <!-- 打赏按钮交互 -->
-  <script>
-    const btn   = document.getElementById('rewardBtn');
-    const panel = document.getElementById('rewardPanel');
-    btn.onclick = () => panel.style.display =
-      panel.style.display === 'block' ? 'none' : 'block';
-  </script>
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 </body>
 </html>
