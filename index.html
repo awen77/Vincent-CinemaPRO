@@ -405,50 +405,43 @@ function play() {
   </div>
 </div>
 
-<script>
-  const btn  = document.getElementById('rewardBtn');
-  const panel= document.getElementById('rewardPanel');
-  btn.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-<script>
+  <!-- 打赏按钮交互 -->
+  <script>
+    const btn   = document.getElementById('rewardBtn');
+    const panel = document.getElementById('rewardPanel');
+    btn.onclick = () => panel.style.display =
+      panel.style.display === 'block' ? 'none' : 'block';
+  </script>
 
-<script>
-<!-- ✅ 今日访问（300-500 包，已修不显示 bug） -->
-<div id="todayBox" style="position:fixed;top:60px;left:15px;background:rgba(0,0,0,.7);color:#e5e5e5;padding:6px 12px;border-radius:15px;font-size:13px;z-index:9999;">
-  <span>📅 今日访问：</span><span id="todayCount">0</span>
-</div>
+  <!-- 今日访问（300-500 包） -->
+  <script>
+  (() => {
+    const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
+    const baseKey  = todayKey + '_base';
 
-<script>
-(() => {
-  const todayKey = 'today_' + location.pathname + '_' + new Date().toISOString().slice(0, 10);
-  const baseKey = todayKey + '_base';
+    let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
+    real += 1;
+    localStorage.setItem(todayKey, real);
 
-  let real = parseInt(localStorage.getItem(todayKey) || '0', 10);
-  real += 1;
-  localStorage.setItem(todayKey, real);
+    let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
+    if (base === 0) {
+      base = 300 + Math.floor(Math.random() * 201);   // 300-500
+      localStorage.setItem(baseKey, base);
+    }
 
-  let base = parseInt(localStorage.getItem(baseKey) || '0', 10);
-  if (base === 0) {
-    base = 300 + Math.floor(Math.random() * 201); // 300-500
-    localStorage.setItem(baseKey, base);
-  }
+    document.getElementById('todayCount').textContent = real;
 
-  // 直接显示当前值
-  document.getElementById('todayCount').textContent = real;
-
-  // 后台均匀涨：8 小时内涨完
-  const need = base - real;
-  if (need > 0) {
-    const gap = (8 * 3600 * 1000) / need;
-    const jitter = gap * 0.5;
-    setInterval(() => {
-      real += 1;
-      localStorage.setItem(todayKey, real);
-      document.getElementById('todayCount').textContent = real;
-    }, gap + Math.random() * jitter);
-  }
-})();
-</script>
-
-
+    const need = base - real;
+    if (need > 0) {
+      const gap   = (8 * 3600 * 1000) / need;
+      const jitter = gap * 0.5;
+      setInterval(() => {
+        real += 1;
+        localStorage.setItem(todayKey, real);
+        document.getElementById('todayCount').textContent = real;
+      }, gap + Math.random() * jitter);
+    }
+  })();
+  </script>
 </body>
 </html>
