@@ -379,53 +379,55 @@ head.appendChild(script);
 <script>function backTop(){jQuery('html,body').stop(false,true).animate({scrollTop:0},600)}</script> 
 <script>jQuery(function(){jQuery("#wysj-switch").on('click',function(event){if(jQuery(this).hasClass('wysj-icon-open')){jQuery(this).removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open wysj-hidden')}else{jQuery("#wysj-pop").show();jQuery(this).addClass('wysj-icon-open');jQuery("#wysj-normal").addClass('wysj-box-open').removeClass('wysj-hidden')}});jQuery("#wysj-pop").on('click touchstart touchmove',function(event){jQuery("#wysj-switch").removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open').addClass('wysj-hidden');jQuery("#wysj-talk-box").removeClass('wysj-hidden');jQuery(this).hide()});jQuery(".wysj-talk").on('click',function(event){event.preventDefault();jQuery("#wysj-talk-box").addClass('wysj-hidden');jQuery("#wysj-normal").removeClass('wysj-hidden');jQuery("#wysj-pop").show()})});</script> 
 <script>function fuckyou(){window.close();window.location="about:blank"}function ck(){console.profile();console.profileEnd();if(console.clear){console.clear()};if(typeof console.profiles=="object"){return console.profiles.length>0}}function hehe(){if((window.console&&(console.firebug||console.table&&/firebug/i.test(console.table())))||(typeof opera=='object'&&typeof opera.postError=='function'&&console.profile.length>0)){fuckyou()}if(typeof console.profiles=="object"&&console.profiles.length>0){fuckyou()}}hehe();window.onresize=function(){if((window.outerHeight-window.innerHeight)>200)fuckyou()}</script>
-<script>
-/* 判断当前选中接口应 GET 还是 POST */
-function needPOST(jk){
-    // 下面这几个接口实测只收 POST
-    const postList=[
-        'video.isyour.love',
-        'jx.m3u8.tv',
-        'api.quanminjiexi.com'
-    ];
-    return postList.some(u=>jk.includes(u));
-}
-
+/* ======  以下整段贴进你的 <script>，把旧 play() 完全替换  ====== */
 function play(){
-    const url  = document.getElementById('url').value.trim();
-    if(!url){ alert('请输入视频地址！'); return; }
+    const url=document.getElementById('url').value.trim();
+    if(!url){alert('请粘贴视频链接');return;}
 
-    const jk   = document.getElementById('jk').value;
-    const box  = document.getElementById('palybox');
+    const player=document.getElementById('player');
+    const jk=currentUrl;               // 你线路卡片里选中的接口
+    const isPOST=/video\.isyour\.love|jx\.m3u8\.tv|api\.quanminjiexi\.com/i.test(jk);
 
-    document.getElementById('tittext').innerText = url;
+    document.getElementById('info').style.display='block';
+    document.getElementById('title').innerHTML='正在缓冲...';
 
-    /* 1. 纯 GET 接口，直接拼地址 */
-    if(!needPOST(jk)){
-        box.src = jk + encodeURIComponent(url);
+    /* ---------- 1. 纯 GET ---------- */
+    if(!isPOST){
+        player.src=jk+encodeURIComponent(url);
+        setTimeout(()=>{document.getElementById('title').innerHTML='播放成功！';},2000);
         return;
     }
 
-    /* 2. 必须 POST 的接口，用 fetch 转发 */
+    /* ---------- 2. 必须 POST ---------- */
     fetch(jk,{
         method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        headers:{
+            'Content-Type':'application/x-www-form-urlencoded',
+            'Referer':window.location.origin,
+            'User-Agent':navigator.userAgent
+        },
         body:'url='+encodeURIComponent(url),
-        referrer:'no-referrer'
+        redirect:'follow'          // 让 fetch 自动跟 302
     })
-    .then(r=>r.ok?r.json():Promise.reject('网络错误'))
-    .then(json=>{
-        /* 大部分 POST 接口会返回 {"url":"...","redirect":"..."} */
-        const target = json.url || json.redirect || json.playurl;
-        if(!target) throw '解析失败';
-        box.src = target;
+    .then(r=>{
+        /* 跟完 302 后取最终地址 */
+        if(r.ok&&r.url!==jk){        // 已被重定向
+            player.src=r.url;
+        }else{                       // 个别接口把真实地址藏在 json 里
+            return r.json().then(j=>{
+                const tgt=j.url||j.playurl||j.redirect;
+                if(!tgt)throw'解析失败';
+                player.src=tgt;
+            });
+        }
     })
     .catch(e=>{
         alert('解析失败：'+e);
-        box.src='about:blank';
+        player.src='';
+        document.getElementById('title').innerHTML='播放失败，请换线';
     });
 }
-</script>
+/* ======  替换结束  ====== */
 <!-- ✅ 打赏作者 - 右上角悬浮 -->
 <div id="reward" style="position:fixed;top:60px;right:15px;z-index:9999;text-align:center;">
 
