@@ -380,15 +380,50 @@ head.appendChild(script);
 <script>jQuery(function(){jQuery("#wysj-switch").on('click',function(event){if(jQuery(this).hasClass('wysj-icon-open')){jQuery(this).removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open wysj-hidden')}else{jQuery("#wysj-pop").show();jQuery(this).addClass('wysj-icon-open');jQuery("#wysj-normal").addClass('wysj-box-open').removeClass('wysj-hidden')}});jQuery("#wysj-pop").on('click touchstart touchmove',function(event){jQuery("#wysj-switch").removeClass('wysj-icon-open');jQuery("#wysj-normal").removeClass('wysj-box-open').addClass('wysj-hidden');jQuery("#wysj-talk-box").removeClass('wysj-hidden');jQuery(this).hide()});jQuery(".wysj-talk").on('click',function(event){event.preventDefault();jQuery("#wysj-talk-box").addClass('wysj-hidden');jQuery("#wysj-normal").removeClass('wysj-hidden');jQuery("#wysj-pop").show()})});</script> 
 <script>function fuckyou(){window.close();window.location="about:blank"}function ck(){console.profile();console.profileEnd();if(console.clear){console.clear()};if(typeof console.profiles=="object"){return console.profiles.length>0}}function hehe(){if((window.console&&(console.firebug||console.table&&/firebug/i.test(console.table())))||(typeof opera=='object'&&typeof opera.postError=='function'&&console.profile.length>0)){fuckyou()}if(typeof console.profiles=="object"&&console.profiles.length>0){fuckyou()}}hehe();window.onresize=function(){if((window.outerHeight-window.innerHeight)>200)fuckyou()}</script>
 <script>
-function play() {
-    var url = document.getElementById('url').value;
-    if (!url) {
-        alert('请输入视频地址！');
+/* 判断当前选中接口应 GET 还是 POST */
+function needPOST(jk){
+    // 下面这几个接口实测只收 POST
+    const postList=[
+        'video.isyour.love',
+        'jx.m3u8.tv',
+        'api.quanminjiexi.com'
+    ];
+    return postList.some(u=>jk.includes(u));
+}
+
+function play(){
+    const url  = document.getElementById('url').value.trim();
+    if(!url){ alert('请输入视频地址！'); return; }
+
+    const jk   = document.getElementById('jk').value;
+    const box  = document.getElementById('palybox');
+
+    document.getElementById('tittext').innerText = url;
+
+    /* 1. 纯 GET 接口，直接拼地址 */
+    if(!needPOST(jk)){
+        box.src = jk + encodeURIComponent(url);
         return;
     }
-    var jk = document.getElementById('jk').value;
-    document.getElementById('tittext').innerHTML = url;
-    document.getElementById('palybox').src = jk + encodeURIComponent(url);
+
+    /* 2. 必须 POST 的接口，用 fetch 转发 */
+    fetch(jk,{
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'url='+encodeURIComponent(url),
+        referrer:'no-referrer'
+    })
+    .then(r=>r.ok?r.json():Promise.reject('网络错误'))
+    .then(json=>{
+        /* 大部分 POST 接口会返回 {"url":"...","redirect":"..."} */
+        const target = json.url || json.redirect || json.playurl;
+        if(!target) throw '解析失败';
+        box.src = target;
+    })
+    .catch(e=>{
+        alert('解析失败：'+e);
+        box.src='about:blank';
+    });
 }
 </script>
 <!-- ✅ 打赏作者 - 右上角悬浮 -->
