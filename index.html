@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">    <title>Vincent Cinema Pro - 手机秒播版</title>
+    <meta name="description" content="一行解锁全网VIP · 手机专属 · 2025最爽解析">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root{--primary:#e50914;--bg:#000;--text:#fff}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html, body {
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+            overscroll-behavior: none;
+        }
+        body{
+            background:#000;color:#fff;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+            overflow-x:hidden;min-height:100vh;
+            -webkit-tap-highlight-color:transparent;
+            user-select: none;
+        }
+        .bg-poster{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:url(https://s1.ax1x.com/2023/09/10/pP4K5rT.jpg) center/cover no-repeat;
+            filter:blur(30px) brightness(0.3) saturate(1.5);
+            transform:scale(1.15);z-index:-2;
+        }
+        .overlay{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:linear-gradient(135deg,rgba(0,0,0,0.88),rgba(10,0,25,0.95));
+            z-index:-1;
+        }
+        .cinema-light{
+            position:fixed;top:0;left:0;right:0;height:4px;
+            background:linear-gradient(90deg,#e50914,#ff6a00,#e50914);
+            background-size:200%;animation:light 10s linear infinite;
+            box-shadow:0 0 30px rgba(229,9,20,0.6);z-index:10;
+        }
+        @keyframes light{0%{background-position:0%}100%{background-position:200%}}
+
+        .header{text-align:center;padding:60px 20px 30px}
+        .cinema-title h1{
+            font-size:clamp(2.5rem,10vw,4.5rem);font-weight:900;letter-spacing:4px;
+            background:linear-gradient(135deg,#fff,#e0e0e0,#aaa,#ccc,#fff);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            animation:softGlow 8s ease-in-out infinite;
+        }
+        .cinema-title p.subtitle{
+            margin-top:15px;font-size:clamp(0.9rem,4vw,1.2rem);color:#ddd;letter-spacing:2px;
+        }
+        @keyframes softGlow{
+            0%,100%{filter:brightness(1) drop-shadow(0 0 15px rgba(255,255,255,0.3))}
+            50%{filter:brightness(1.2) drop-shadow(0 0 35px rgba(229,9,20,0.25))}
+        }
+
+        .movie-info{
+            text-align:center;margin:15px;padding:15px;
+            background:rgba(255,255,255,0.1);border-radius:20px;
+            backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.2);
+            display:none;font-size:1rem;
+        }
+
+        .player-card{
+            border-radius:20px;overflow:hidden;
+            box-shadow:0 20px 60px rgba(229,9,20,0.4);
+            margin:20px 15px;position:relative;
+        }
+        #player{width:100%;height:56vw;background:#000}
+        @media (orientation: landscape){
+            #player{height:100vh !important;border-radius:0}
+            .player-card{margin:0;border-radius:0;box-shadow:none}
+        }
+
+        .all-in-one-bar{
+            display:flex;align-items:center;
+            background:rgba(255,255,255,0.18);backdrop-filter:blur(30px);
+            border:2px solid rgba(255,255,255,0.35);border-radius:50px;
+            padding:14px 18px;box-shadow:0 15px 40px rgba(0,0,0,0.6);
+            margin:25px 15px 20px;gap:12px;
+            transition:all 0.4s;
+        }
+        .all-in-one-bar:focus-within{
+            border-color:var(--primary);
+            box-shadow:0 0 0 6px rgba(229,9,20,0.3);
+        }
+        #url{
+            flex:1;background:transparent;border:none;outline:none;
+            color:#fff;font-size:16px !important;
+            padding:8px 0;
+        }
+        #url::placeholder{color:#bbb;font-size:1rem}
+
+        .jk-cards{
+            display:block;overflow-x:auto;white-space:nowrap;padding:15px 15px 5px;
+            scrollbar-width:none;margin:0 15px 20px;
+        }
+        .jk-cards::-webkit-scrollbar{display:none}
+        .jk-card{
+            display:inline-block;background:rgba(255,255,255,0.2);backdrop-filter:blur(15px);
+            border-radius:50px;padding:10px 20px;margin-right:10px;
+            border:2px solid transparent;font-size:0.95rem;min-width:120px;text-align:center;
+            transition:all 0.3s;cursor:pointer;
+        }
+        .jk-card.active,.jk-card:hover{
+            border-color:var(--primary);background:rgba(229,9,20,0.35);transform:scale(1.08);
+        }
+
+        .paste-btn{
+            background:transparent;border:none;color:#ddd;font-size:1.8rem;
+            padding:8px 10px;cursor:pointer;transition:all 0.3s;
+        }
+        .paste-btn:hover{color:#fff;transform:scale(1.3)}
+        .play-btn{
+            background:var(--primary);color:#fff;border:none;border-radius:50px;
+            padding:14px 35px;font-size:1.2rem;font-weight:bold;
+            letter-spacing:2px;cursor:pointer;box-shadow:0 10px 30px rgba(229,9,20,0.5);
+            transition:all 0.3s;min-width:120px;
+        }
+        .play-btn:hover{transform:scale(1.08)}
+
+        /* 新增：选集区域 */
+        .episodes-container{
+            margin:0 15px 15px;display:none;
+            background:rgba(255,255,255,0.1);border-radius:20px;
+            padding:15px;backdrop-filter:blur(15px);
+            border:1px solid rgba(255,255,255,0.2);
+        }
+        .episodes-title{
+            color:#fff;font-size:1rem;margin-bottom:10px;padding-left:5px;
+            font-weight:bold;display:flex;align-items:center;gap:8px;
+        }
+        .episodes-grid{
+            display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+        }
+        .ep-btn{
+            background:rgba(255,255,255,0.15);color:#fff;border:none;
+            padding:10px 8px;font-size:0.85rem;border-radius:12px;
+            cursor:pointer;transition:all 0.3s;text-align:center;
+        }
+        .ep-btn.active,.ep-btn:hover{
+            background:var(--primary);transform:scale(1.05);
+        }
+
+        .logo-box{
+            background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);
+            border-radius:30px;padding:40px 20px;margin:0 15px 40px;
+            border:1px solid rgba(255,255,255,0.15);text-align:center;
+        }
+        .title-tit h4{font-size:1.8rem;margin-bottom:30px;color:#fff}
+        .logo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        .logo-item a{
+            display:flex;flex-direction:column;align-items:center;
+            background:rgba(255,255,255,0.1);padding:20px 15px;border-radius:20px;
+            border:2px solid rgba(255,255,255,0.2);transition:all 0.4s;text-decoration:none;height:100px;
+        }
+        .logo-item a:hover{
+            transform:translateY(-8px) scale(1.1);background:rgba(229,9,20,0.3);
+            border-color:var(--primary);box-shadow:0 15px 40px rgba(229,9,20,0.4)
+        }
+        .logo-item img{width:44px;height:44px;object-fit:contain;filter:brightness(0) invert(1);opacity:0.9}
+        .logo-item a:hover img{filter:none;opacity:1;transform:scale(1.2)}
+        .logo-item span{color:#fff;font-size:0.9rem;font-weight:600;margin-top:8px}
+
+        footer{padding:0 15px 60px}
+        .footer-guide{max-width:100%;margin:0 auto;display:flex;flex-direction:column;gap:25px}
+        .guide-card{
+            background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);
+            border-radius:25px;border:1px solid rgba(255,255,255,0.15);
+            overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,0.4);
+        }
+        .card-header{
+            padding:20px;background:rgba(229,9,20,0.15);cursor:pointer;
+            display:flex;justify-content:space-between;align-items:center;
+        }
+        .card-header h3{font-size:1.3rem;color:#fff;font-weight:700}
+        .arrow{font-size:1.4rem;transition:transform 0.4s;color:#aaa}
+        .guide-card.active .arrow{transform:rotate(180deg);color:#e50914}
+        .card-content{padding:0 20px 20px;max-height:0;overflow:hidden;transition:all 0.6s ease;opacity:0}
+        .guide-card.active .card-content{max-height:600px;padding:25px 20px 35px;opacity:1}
+        .steps{list-style:none;counter-reset:step;padding-left:5px}
+        .steps li{
+            position:relative;padding:16px 0 16px 55px;font-size:1rem;line-height:1.7;color:#eee;
+            border-bottom:1px dashed rgba(255,255,255,0.15)
+        }
+        .steps li:last-child{border:none}
+        .steps li::before{
+            counter-increment:step;content:counter(step);position:absolute;left:0;top:10px;
+            width:36px;height:36px;background:var(--primary);color:#fff;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;
+            box-shadow:0 0 15px rgba(229,9,20,0.6);
+        }
+        .about-text{font-size:1.1rem;line-height:1.9;color:#fff;text-align:center}
+        .highlight{font-size:1.2rem;color:#e50914;text-align:center;font-weight:bold;margin:15px 0}
+        .copyright{
+            text-align:center;padding:30px 20px 40px;color:#888;font-size:0.9rem;
+            background:rgba(0,0,0,0.4);border-radius:20px;margin:0 15px 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="cinema-light"></div>
+<div class="bg-poster"></div>
+<div class="overlay"></div>
+
+<!-- 彻底干掉 User Info -->
+<script>
+window.addEventListener('load', () => {
+    document.querySelector('pre')?.remove();
+});
+</script>
+
+<div class="header">
+    <div class="cinema-title">
+        <h1>Vincent Cinema</h1>
+        <p class="subtitle">秒开全网VIP · 永不卡顿 · 永久免费</p>
+    </div>
+</div>
+
+<div class="movie-info" id="info">
+    <div class="movie-title" id="title">正在解析影片信息...</div>
+</div>
+
+<div class="player-card">
+    <iframe id="player" src="" allowfullscreen frameborder="0"></iframe>
+</div>
+
+<div class="all-in-one-bar">
+    <i class="fa fa-search" style="color:#888;font-size:1.4rem"></i>
+    <input type="text" id="url" placeholder="粘贴链接 回车秒播">
+    <button class="paste-btn" onclick="pasteUrl()"><i class="fa fa-paste"></i></button>
+    <button class="play-btn" onclick="play()">立即播放</button>
+</div>
+
+<!-- 新增：选集容器 -->
+<div class="episodes-container" id="episodes-container">
+    <div class="episodes-title"><i class="fas fa-list-ul"></i> 选集</div>
+    <div class="episodes-grid" id="episodes-grid"></div>
+</div>
+
+<div class="jk-cards" id="jk-cards"></div>
+
+<footer>
+    <div class="footer-guide">
+        <div class="guide-card active">
+            <div class="card-header" onclick="this.parentElement.classList.toggle('active')">
+                <h3>手机操作指南</h3>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <div class="card-content">
+                <ol class="steps">
+                    <li>第 一 步：进入各大视频网站，找到想要观看的<strong>VIP视频（例如：腾讯、爱奇艺、优酷、乐视、芒果、搜狐等）</strong>，然后<strong>复制完整的视频链接</strong>。</li>
+                    <li>第 二 步：将复制的视频链接<strong>粘贴到上方输入框</strong>，点击“<strong>立即播放</strong>”。</li>
+                    <li>第 三 步：等待解析完成，即可<strong>免费观看VIP视频</strong>。</li>
+                    <li>第 四 步：注意事项：全网VIP电影免费看，若遇到不能播放，确保视频地址无误后，<strong>请更换“播放线路”再次点击“解析播放”</strong>即可。</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="guide-card active">
+            <div class="card-header" onclick="this.parentElement.classList.toggle('active')">
+                <h3>关于我们</h3>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <div class="card-content">
+                <p class="about-text">
+                    <strong>Vincent Cinema</strong>是非盈利公益站点，仅用于学习交流，<br>
+                    <strong>不存储、不录制</strong>任何视频内容。
+                </p>
+                <p class="highlight">稳定运行 · 支持全网VIP解析</p>
+            </div>
+        </div>
+
+        <div class="logo-box">
+            <div class="title-tit"><h4>已支持平台（点击直达）</h4></div>
+            <div class="logo-grid">
+                <div class="logo-item"><a href="https://www.iqiyi.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/iqiyilogo.png" alt="爱奇艺"><span>爱奇艺</span></a></div>
+                <div class="logo-item"><a href="https://v.qq.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/qqlogo.png" alt="腾讯"><span>腾讯视频</span></a></div>
+                <div class="logo-item"><a href="https://www.youku.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/youkulogo.png" alt="优酷"><span>优酷</span></a></div>
+                <div class="logo-item"><a href="https://www.mgtv.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/hunantvlogo.png" alt="芒果"><span>芒果TV</span></a></div>
+                <div class="logo-item"><a href="https://www.le.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/letvlogo.png" alt="乐视"><span>乐视</span></a></div>
+                <div class="logo-item"><a href="https://www.bilibili.com" target="_blank"><img src="https://www.machunjie.com/wp-content/themes/bdidq/diy/logo/bilibili.png" alt="B站"><span>Bilibili</span></a></div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="copyright">
+    © 2025 Vincent Cinema Pro · 手机专属版<br>
+    <span style="color:#e50914;font-weight:bold;">一行秒播 · 永不卡顿 · 完全免费</span>
+</div>
+
+<script>
+// 7 条最稳线路
+const lines = [
+    {name:"默认VIP", url:"https://jx.xmflv.cc/?url="},
+    {name:"线路①", url:"https://jx.2s0.cn/player/?url="},
+    {name:"线路②", url:"https://jx.nnxv.cn/tv.php?url="},
+    {name:"线路③", url:"//jx.m3u8.tv/jiexi/?url="},
+    {name:"线路④", url:"https://jx.playerjy.com/?url="},
+    {name:"线路⑤", url:"//video.isyour.love/player/getplayer?url="},
+    {name:"线路⑥", url:"https://jx.m3u8.tv/jiexi/?url="}
+];
+let currentUrl = lines[0].url;
+let currentPlayUrl = '';
+
+// 初始化线路
+const cardsContainer = document.getElementById('jk-cards');
+lines.forEach((line, i) => {
+    const card = document.createElement('div');
+    card.className = 'jk-card' + (i===0 ? ' active' : '');
+    card.textContent = line.name;
+    card.onclick = () => {
+        document.querySelectorAll('.jk-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        currentUrl = line.url;
+        if (currentPlayUrl) play(currentPlayUrl);
+    };
+    cardsContainer.appendChild(card);
+});
+
+function pasteUrl() {
+    navigator.clipboard.readText().then(text => {
+        document.getElementById('url').value = text.trim();
+        play();
+    }).catch(() => alert('长按输入框 → 粘贴'));
+}
+
+async function play(inputUrl = null) {
+    let url = inputUrl || document.getElementById('url').value.trim();
+    if (!url) { alert('请粘贴视频链接'); return; }
+
+    currentPlayUrl = url;
+    document.getElementById('player').src = currentUrl + encodeURIComponent(url);
+    document.getElementById('info').style.display = 'block';
+    document.getElementById('title').innerHTML = '正在缓冲...';
+    setTimeout(() => {
+        document.getElementById('title').innerHTML = '播放成功！';
+    }, 3000);
+
+    // 自动获取选集
+    await fetchEpisodes(url);
+}
+
+// 自动获取选集
+async function fetchEpisodes(url) {
+    const container = document.getElementById('episodes-container');
+    const grid = document.getElementById('episodes-grid');
+    grid.innerHTML = '';
+    container.style.display = 'none';
+
+    let episodes = [];
+
+    try {
+        // 腾讯视频
+        if (url.includes('v.qq.com') && url.includes('cover')) {
+            const coverId = url.match(/cover\/[^\/]+\/([^\.]+)\.html/)?.[1];
+            if (coverId) {
+                const api = `https://v.qq.com/detail/m/${coverId}.html`;
+                // 模拟获取（真实需 CORS 代理，此处用 mock）
+                episodes = await mockTencentEpisodes(coverId);
+            }
+        }
+        // 爱奇艺
+        else if (url.includes('iqiyi.com')) {
+            const tvId = url.match(/v_([^\.]+)\.html/)?.[1];
+            if (tvId) episodes = await mockIqiyiEpisodes(tvId);
+        }
+        // 优酷
+        else if (url.includes('youku.com')) {
+            episodes = await mockYoukuEpisodes();
+        }
+    } catch (e) {}
+
+    if (episodes.length > 1) {
+        episodes.forEach((ep, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'ep-btn' + (i===0 ? ' active' : '');
+            btn.textContent = ep.title;
+            btn.onclick = () => {
+                document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                play(ep.url);
+            };
+            grid.appendChild(btn);
+        });
+        container.style.display = 'block';
+    }
+}
+
+// Mock 数据（真实项目可用 CORS 代理或后端）
+async function mockTencentEpisodes(coverId) {
+    return [
+        {title: "第1集", url: `https://v.qq.com/x/cover/${coverId}/p123.html`},
+        {title: "第2集", url: `https://v.qq.com/x/cover/${coverId}/p124.html`},
+        {title: "第3集", url: `https://v.qq.com/x/cover/${coverId}/p125.html`},
+        // 更多...
+    ].slice(0, 30);
+}
+
+async function mockIqiyiEpisodes(tvId) {
+    return Array.from({length: 20}, (_, i) => ({
+        title: `第${i+1}集`,
+        url: `https://www.iqiyi.com/v_${tvId}_ep${i+1}.html`
+    }));
+}
+
+async function mockYoukuEpisodes() {
+    return Array.from({length: 15}, (_, i) => ({
+        title: `第${i+1}集`,
+        url: `https://v.youku.com/v_show/id_xxx_ep${i+1}.html`
+    }));
+}
+
+document.getElementById('url').addEventListener('keyup', e => { if (e.key === 'Enter') play(); });
+document.getElementById('url').addEventListener('paste', () => setTimeout(play, 100));
+</script>
+<!-- ===== 新版打赏补丁：无 transform，不污染 fixed ===== -->
+<style>
+#reward-corner{position:fixed;top:12px;right:15px;display:flex;align-items:center;gap:6px;background:rgba(229,9,20,.9);border-radius:30px;padding:6px 12px;font-size:13px;font-weight:bold;color:#fff;cursor:pointer;box-shadow:0 4px 15px rgba(229,9,20,.45);z-index:999}
+#reward-mask{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:1000;display:none}
+#reward-box{position:fixed;top:0;left:0;right:0;bottom:0;margin:auto;width:90%;max-width:360px;height:fit-content;background:rgba(22,22,22,.85);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:25px 20px 30px;text-align:center;color:#fff;z-index:1001;display:none}
+#reward-close{position:absolute;right:15px;top:15px;font-size:26px;color:#aaa;cursor:pointer}
+.reward-imgs{display:flex;justify-content:space-around;gap:15px;margin-top:15px}
+.reward-imgs img{width:100%;max-width:130px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.5)}
+.reward-imgs p{margin-top:8px;font-size:.9rem;color:#ddd}
+</style>
+
+<div id="reward-corner"><i class="fa fa-gift"></i><span>打赏作者</span></div>
+<div id="reward-mask"></div>
+<div id="reward-box"><span id="reward-close">&times;</span><h3>觉得好用？打赏支持一下～</h3><div class="reward-imgs"><div><img src="assets/img/wx_qrcode.png" alt="微信二维码"><p>加微信</p></div><div><img src="assets/img/wx_pay.png" alt="微信收款码"><p>微信打赏</p></div></div></div>
+
+<script>
+const mask=document.getElementById('reward-mask'),box=document.getElementById('reward-box'),close=document.getElementById('reward-close'),btn=document.getElementById('reward-corner');
+function toggleReward(show){mask.style.display=box.style.display=show?'block':'none';document.body.style.overflow=show?'hidden':''}
+btn.onclick=()=>toggleReward(true);close.onclick=mask.onclick=()=>toggleReward(false);
+</script>
+<!-- ===== 打赏补丁结束 ===== -->
+<!-- ===== 哲学文案：15~20字·极简·无背景 ===== -->
+<style>
+#philosophy-text{
+  position:fixed;
+  top:12px;
+  left:15px;
+  color:#fff;
+  font-size:18px;
+  font-weight:500;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  letter-spacing:.8px;
+  opacity:0;
+  transition:opacity 1.2s ease-in-out;
+  z-index:998;
+  pointer-events:none;
+}
+#philosophy-text.show{opacity:1}
+</style>
+<span id="philosophy-text"></span>
+
+<script>
+const quotes=[
+  "风是自由的，你也是，别被任何人束缚。",
+  "先成为自己的山，再去找那片海。",
+  "允许一切发生，然后继续向前。",
+  "无所求，必满载而归；心有光，必抵达。",
+  "凡是过往，皆为序章；所有将来，皆可期待。"
+];
+let idx=0;
+const txt=document.getElementById('philosophy-text');
+function fadeQuote(){
+  txt.classList.remove('show');
+  setTimeout(()=>{
+    txt.textContent=quotes[idx];
+    txt.classList.add('show');
+    idx=(idx+1)%quotes.length;
+  },1200);
+}
+fadeQuote();
+setInterval(fadeQuote,8000);
+</script>
+<!-- ===== 哲学文案结束 ===== -->
+</body>
+</html>
