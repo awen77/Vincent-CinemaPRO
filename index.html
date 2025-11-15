@@ -116,6 +116,7 @@
             padding:14px 35px;font-size:1.2rem;font-weight:bold;
             letter-spacing:2px;cursor:pointer;box-shadow:0 10px 30px rgba(229,9,20,0.5);
             transition:all 0.3s;min-width:120px;
+            white-space:nowrap;
         }
         .play-btn:hover{transform:scale(1.08)}
 
@@ -428,7 +429,7 @@ document.getElementById('url').addEventListener('paste', () => setTimeout(play, 
 
 <div id="reward-corner"><i class="fa fa-gift"></i><span>打赏作者</span></div>
 <div id="reward-mask"></div>
-<div id="reward-box"><span id="reward-close">&times;</span><h3>觉得好用？打赏支持一下～</h3><div class="reward-imgs"><div><img src="assets/img/wx_qrcode.png" alt="微信二维码"><p>加微信</p></div><div><img src="assets/img/wx_pay.png" alt="微信收款码"><p>微信打赏</p></div></div></div>
+<div id="reward-box"><span id="reward-close">&times;</span><h3>觉得好用？打赏支持一下～</h3><div class="reward-imgs"><div><img src="img/wx_qrcode.png" alt="微信二维码"><p>加微信</p></div><div><img src="img/wx_pay.png" alt="微信收款码"><p>微信打赏</p></div></div></div>
 
 <script>
 const mask=document.getElementById('reward-mask'),box=document.getElementById('reward-box'),close=document.getElementById('reward-close'),btn=document.getElementById('reward-corner');
@@ -436,47 +437,5 @@ function toggleReward(show){mask.style.display=box.style.display=show?'block':'n
 btn.onclick=()=>toggleReward(true);close.onclick=mask.onclick=()=>toggleReward(false);
 </script>
 <!-- ===== 打赏补丁结束 ===== -->
-<!-- ===== 哲学文案：15~20字·极简·无背景 ===== -->
-<style>
-#philosophy-text{
-  position:fixed;
-  top:12px;
-  left:15px;
-  color:#fff;
-  font-size:18px;
-  font-weight:500;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  letter-spacing:.8px;
-  opacity:0;
-  transition:opacity 1.2s ease-in-out;
-  z-index:998;
-  pointer-events:none;
-}
-#philosophy-text.show{opacity:1}
-</style>
-<span id="philosophy-text"></span>
-
-<script>
-const quotes=[
-  "风是自由的，你也是，别被任何人束缚。",
-  "先成为自己的山，再去找那片海。",
-  "允许一切发生，然后继续向前。",
-  "无所求，必满载而归；心有光，必抵达。",
-  "凡是过往，皆为序章；所有将来，皆可期待。"
-];
-let idx=0;
-const txt=document.getElementById('philosophy-text');
-function fadeQuote(){
-  txt.classList.remove('show');
-  setTimeout(()=>{
-    txt.textContent=quotes[idx];
-    txt.classList.add('show');
-    idx=(idx+1)%quotes.length;
-  },1200);
-}
-fadeQuote();
-setInterval(fadeQuote,8000);
-</script>
-<!-- ===== 哲学文案结束 ===== -->
 </body>
 </html>
